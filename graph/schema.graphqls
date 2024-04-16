@@ -32,8 +32,8 @@ type User {
 }
 
 type Query {
-  tigers(page: Int!, pageSize: Int): [Tiger!]!
-  tiger(id: ID!): Tiger!
+  tigers(page: Int!, pageSize: Int!): [Tiger!]!
+  sightingByTiger(tigerID: ID!, page:Int!, pageSize: Int!): [Sighting!]!
 }
 
 input NewTiger {
@@ -46,7 +46,6 @@ input NewTiger {
 
 input NewSighting {
   tigerID: ID!
-  userID: ID!
   date: Time!
   latitude: Float!
   longitude: Float!
@@ -61,6 +60,6 @@ input NewUser {
 type Mutation {
   createTiger(input: NewTiger!): Tiger!
   createSighting(input: NewSighting!): Sighting!
-  createUser(input: NewUser!): User!
+  createUser(input: NewUser!): String!
   login(email: String!, password: String!): String!
 }

@@ -11,7 +11,6 @@ type Mutation struct {
 
 type NewSighting struct {
 	TigerID   uint      `json:"tigerID"`
-	UserID    uint      `json:"userID"`
 	Date      time.Time `json:"date"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
