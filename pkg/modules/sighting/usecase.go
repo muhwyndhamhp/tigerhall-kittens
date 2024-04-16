@@ -12,12 +12,12 @@ type usecase struct {
 }
 
 // CreateSighting implements entities.SightingUsecase.
-func (u *usecase) CreateSighting(sighting *model.Sighting, tigerID uint) (*model.Sighting, error) {
+func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, error) {
 	s := entities.Sighting{
 		Date:      sighting.Date,
 		Latitude:  sighting.Latitude,
 		Longitude: sighting.Longitude,
-		TigerID:   tigerID,
+		TigerID:   sighting.TigerID,
 		UserID:    sighting.UserID,
 	}
 
@@ -26,7 +26,7 @@ func (u *usecase) CreateSighting(sighting *model.Sighting, tigerID uint) (*model
 		return nil, err
 	}
 
-	t, err := u.tigerRepo.FindByID(tigerID)
+	t, err := u.tigerRepo.FindByID(s.TigerID)
 	if err != nil {
 		return nil, err
 	}

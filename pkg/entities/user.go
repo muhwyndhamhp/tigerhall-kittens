@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -20,6 +21,7 @@ type User struct {
 type UserUsecase interface {
 	CreateUser(name, email, password string) (string, error)
 	Login(email, password string) (string, error)
+	GetUserByID(id uint) (*model.User, error)
 }
 
 type UserRepository interface {

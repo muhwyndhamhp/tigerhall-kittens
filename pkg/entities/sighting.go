@@ -17,7 +17,7 @@ type Sighting struct {
 }
 
 type SightingUsecase interface {
-	CreateSighting(sighting *model.Sighting, tigerID uint) (*model.Sighting, error)
+	CreateSighting(sighting *model.Sighting) (*model.Sighting, error)
 	GetSightingsByTigerID(tigerID uint, page, pageSize int) ([]*model.Sighting, error)
 }
 

@@ -11,7 +11,7 @@ type usecase struct {
 }
 
 // CreateTiger implements entities.TigerUsecase.
-func (u *usecase) CreateTiger(tiger *model.Tiger) (*model.Tiger, error) {
+func (u *usecase) CreateTiger(tiger *model.Tiger, userID uint) (*model.Tiger, error) {
 	t := entities.Tiger{
 		Name:          tiger.Name,
 		DateOfBirth:   tiger.DateOfBirth,
@@ -30,6 +30,7 @@ func (u *usecase) CreateTiger(tiger *model.Tiger) (*model.Tiger, error) {
 		Latitude:  tiger.LastLatitude,
 		Longitude: tiger.LastLongitude,
 		TigerID:   t.ID,
+		UserID:    userID,
 	}
 
 	err = u.sightingRepo.Create(&sighting)
@@ -49,6 +50,7 @@ func (u *usecase) CreateTiger(tiger *model.Tiger) (*model.Tiger, error) {
 				Date:      sighting.Date,
 				Latitude:  sighting.Latitude,
 				Longitude: sighting.Longitude,
+				UserID:    sighting.UserID,
 			},
 		},
 	}, nil

@@ -1,11 +1,26 @@
 package user
 
 import (
+	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
 type usecase struct {
 	repo entities.UserRepository
+}
+
+// GetUserByID implements entities.UserUsecase.
+func (u *usecase) GetUserByID(id uint) (*model.User, error) {
+	usr, err := u.repo.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.User{
+		ID:    usr.ID,
+		Name:  usr.Name,
+		Email: usr.Email,
+	}, nil
 }
 
 // CreateUser implements entities.UserUsecase.

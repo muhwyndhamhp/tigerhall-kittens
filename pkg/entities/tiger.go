@@ -18,7 +18,7 @@ type Tiger struct {
 }
 
 type TigerUsecase interface {
-	CreateTiger(tiger *model.Tiger) (*model.Tiger, error)
+	CreateTiger(tiger *model.Tiger, userID uint) (*model.Tiger, error)
 	GetTigers(page, pageSize int) ([]*model.Tiger, error)
 	GetTigerByID(id uint) (*model.Tiger, error)
 }
