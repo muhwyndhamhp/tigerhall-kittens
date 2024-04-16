@@ -20,6 +20,7 @@ type User struct {
 type UserRepository interface {
 	Create(user *User) error
 	FindByEmail(email string) (*User, error)
+	FindByID(id uint) (*User, error)
 }
 
 // Password Hashing Implementation
