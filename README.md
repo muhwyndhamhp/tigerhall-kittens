@@ -11,7 +11,8 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
 - [x] Create new GraphQL Server with GqlGen
 - [x] Create Schema for `User`, `Tiger`, and `Sighting`
 - [x] Connect Turso DB
-- [ ] Create Migration mechanism (Probably using Automigrate Dry Run & gomigrate)
+- ~~[ ] Create Migration mechanism (Probably using Automigrate Dry Run & gomigrate)~~
+- [x] Create Automigrate
 - [ ] Create Auth Implementation using JWT and Middleware
 - [ ] Create CRUD for `User`, `Tiger`, and `Sighting` w/ Pagination
 - [ ] Implement Sighting Rules (Only Beyond 5 km from prev. Sightings)
@@ -21,4 +22,4 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
 - [ ] Create Documentation
 - [ ] Create Dockerfile
 - [ ] Create Fly io Deployment
-
+- [ ] Fix Migration to use proper Migration Mechanism
