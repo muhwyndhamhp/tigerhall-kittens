@@ -3,8 +3,11 @@
 ## Introduction
 This project is to fulfill my application as a Senior Backend Engineer at Tigerhall. 
 
+## Infrastructure Overview
+![Infra Overview](schema.png)
+
 ## Todo List
-- [ ] Graph the Infrastructure Design
+- [x] Graph the Infrastructure Design
 - [ ] Create new GraphQL Server with GqlGen
 - [ ] Create Schema for `User`, `Tiger`, and `Sighting`
 - [ ] Connect Turso DB
