@@ -17,6 +17,7 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
 - [ ] Create CRUD for `User`, `Tiger`, and `Sighting` w/ Pagination
 - [ ] Implement Sighting Rules (Only Beyond 5 km from prev. Sightings)
 - [ ] Create Message Queue using Go Channel and Send Email Notification on Consumer Side
+- [ ] Add transaction for Create operations
 - [ ] Create Unit Test for Each Function
 - [ ] Create Integration Test for Each Endpoint
 - [ ] Create Documentation
