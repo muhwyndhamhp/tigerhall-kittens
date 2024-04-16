@@ -8,9 +8,11 @@ import (
 )
 
 const (
-	ENV_FILE     = ".env"
-	LIBSQL_URL   = "LIBSQL_URL"
-	LIBSQL_TOKEN = "LIBSQL_TOKEN"
+	ENV_FILE            = ".env"
+	LIBSQL_URL          = "LIBSQL_URL"
+	LIBSQL_TOKEN        = "LIBSQL_TOKEN"
+	JWT_SECRET          = "JWT_SECRET"
+	JWT_EXPIRY_DURATION = "JWT_EXPIRY_DURATION"
 )
 
 func init() {

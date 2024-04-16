@@ -4,9 +4,11 @@ go 1.22.1
 
 require (
 	github.com/99designs/gqlgen v0.17.45
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/renxzen/gorm-libsql v0.0.0-20240302231413-bea2dce63ac6
 	github.com/vektah/gqlparser/v2 v2.5.11
+	golang.org/x/crypto v0.22.0
 	gorm.io/gorm v1.25.9
 )
 
