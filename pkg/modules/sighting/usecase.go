@@ -69,7 +69,23 @@ func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, err
 
 // GetSightingsByTigerID implements entities.SightingUsecase.
 func (u *usecase) GetSightingsByTigerID(tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
-	panic("unimplemented")
+	sightings, err := u.repo.FindByTigerID(tigerID, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*model.Sighting
+	for _, s := range sightings {
+		result = append(result, &model.Sighting{
+			ID:        s.ID,
+			Date:      s.Date,
+			Latitude:  s.Latitude,
+			Longitude: s.Longitude,
+			TigerID:   s.TigerID,
+			UserID:    s.UserID,
+		})
+	}
+	return result, nil
 }
 
 func NewSightingUsecase(repo entities.SightingRepository, tigerRepo entities.TigerRepository, userRepo entities.UserRepository) entities.SightingUsecase {
