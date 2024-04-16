@@ -11,14 +11,34 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateTiger is the resolver for the createTiger field.
+func (r *mutationResolver) CreateTiger(ctx context.Context, input model.NewTiger) (*model.Tiger, error) {
+	panic(fmt.Errorf("not implemented: CreateTiger - createTiger"))
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// CreateSighting is the resolver for the createSighting field.
+func (r *mutationResolver) CreateSighting(ctx context.Context, input model.NewSighting) (*model.Sighting, error) {
+	panic(fmt.Errorf("not implemented: CreateSighting - createSighting"))
+}
+
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (string, error) {
+	panic(fmt.Errorf("not implemented: Login - login"))
+}
+
+// Tigers is the resolver for the tigers field.
+func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize *int) ([]*model.Tiger, error) {
+	panic(fmt.Errorf("not implemented: Tigers - tigers"))
+}
+
+// Sightings is the resolver for the sightings field.
+func (r *queryResolver) Sightings(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
+	panic(fmt.Errorf("not implemented: Sightings - sightings"))
 }
 
 // Mutation returns MutationResolver implementation.
@@ -27,5 +47,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

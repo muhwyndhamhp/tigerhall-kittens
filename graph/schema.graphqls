@@ -2,27 +2,62 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+scalar Time
+
+type Tiger {
+    id: ID!
+    name: String!
+    dateOfBirth: Time!
+    lastSeen: Time!
+    lastLatitude: Float!
+    lastLongitude: Float!
+    sightings: [Sighting!]!
+}
+
+type Sighting {
+    id: ID!
+    tiger: Tiger!
+    date: Time!
+    latitude: Float!
+    longitude: Float!
 }
 
 type User {
   id: ID!
   name: String!
+  email: String!
+  hashedPassword: String!
 }
 
 type Query {
-  todos: [Todo!]!
+  tigers(page: Int!, pageSize: Int): [Tiger!]!
+  sightings(tigerID: ID!, page: Int!, pageSize: Int!): [Sighting!]!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+input NewTiger {
+  name: String!
+  dateOfBirth: Time!
+  lastSeen: Time!
+  lastLatitude: Float!
+  lastLongitude: Float!
+}
+
+input NewSighting {
+  tigerID: ID!
+  date: Time!
+  latitude: Float!
+  longitude: Float!
+}
+
+input NewUser {
+  name: String!
+  email: String!
+  password: String!
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createTiger(input: NewTiger!): Tiger!
+  createSighting(input: NewSighting!): Sighting!
+  createUser(input: NewUser!): User!
+  login(email: String!, password: String!): String!
 }
