@@ -8,7 +8,7 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
 
 ## Todo List
 - [x] Graph the Infrastructure Design
-- [ ] Create new GraphQL Server with GqlGen
+- [x] Create new GraphQL Server with GqlGen
 - [ ] Create Schema for `User`, `Tiger`, and `Sighting`
 - [ ] Connect Turso DB
 - [ ] Create Migration mechanism (Probably using Automigrate Dry Run & gomigrate)
