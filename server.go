@@ -37,7 +37,7 @@ func main() {
 	resolver := graph.NewResolver(userUsecase, tigerUsecase, sightingUsecase)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
-	e.Use(echo.WrapMiddleware(user.AuthMiddleware(userRepo)))
+	e.Use(user.AuthMiddleware(userRepo))
 	e.GET("/", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))
 

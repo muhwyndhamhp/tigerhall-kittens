@@ -13,3 +13,6 @@ auto-migrate:
 
 dry-run-migrate:
 	@go run db/migration/main.go --dry-run
+
+run:
+	@air run
