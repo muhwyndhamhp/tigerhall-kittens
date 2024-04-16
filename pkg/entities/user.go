@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
@@ -29,6 +30,8 @@ type UserRepository interface {
 	FindByEmail(email string) (*User, error)
 	FindByID(id uint) (*User, error)
 }
+
+var ErrUserByCtxNotFound = errors.New("ErrUserByCtxNotFound: user not found in context")
 
 // Password Hashing Implementation
 func HashPassword(password string) (string, error) {

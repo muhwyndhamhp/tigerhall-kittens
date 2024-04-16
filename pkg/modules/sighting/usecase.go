@@ -1,6 +1,7 @@
 package sighting
 
 import (
+	geo "github.com/kellydunn/golang-geo"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
@@ -13,6 +14,18 @@ type usecase struct {
 
 // CreateSighting implements entities.SightingUsecase.
 func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, error) {
+	ls, err := u.repo.FindByTigerID(sighting.TigerID, 1, 1)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(ls) > 0 {
+		p0 := geo.NewPoint(ls[0].Latitude, ls[0].Longitude)
+		p1 := geo.NewPoint(sighting.Latitude, sighting.Longitude)
+		if p1.GreatCircleDistance(p0) <= 5.0 {
+			return nil, entities.ErrTigerTooClose
+		}
+	}
 	s := entities.Sighting{
 		Date:      sighting.Date,
 		Latitude:  sighting.Latitude,
@@ -21,7 +34,7 @@ func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, err
 		UserID:    sighting.UserID,
 	}
 
-	err := u.repo.Create(&s)
+	err = u.repo.Create(&s)
 	if err != nil {
 		return nil, err
 	}

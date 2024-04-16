@@ -2,15 +2,12 @@ package user
 
 import (
 	"context"
-	"errors"
 
 	"github.com/labstack/echo/v4"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
 var keyUser = &ctxKey{"user"}
-
-var ErrUserByCtxNotFound = errors.New("ErrUserByCtxNotFound: user not found in context")
 
 type ctxKey struct {
 	name string
@@ -49,12 +46,12 @@ func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
 func UserByCtx(ctx context.Context) (*entities.User, error) {
 	i := ctx.Value(keyUser)
 	if i == nil {
-		return nil, ErrUserByCtxNotFound
+		return nil, entities.ErrUserByCtxNotFound
 	}
 
 	v := i.(*entities.User)
 	if v == nil {
-		return nil, ErrUserByCtxNotFound
+		return nil, entities.ErrUserByCtxNotFound
 	}
 	return v, nil
 }
