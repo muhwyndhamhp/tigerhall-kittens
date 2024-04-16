@@ -41,6 +41,16 @@ func (r *queryResolver) Tiger(ctx context.Context, id uint) (*model.Tiger, error
 	panic(fmt.Errorf("not implemented: Tiger - tiger"))
 }
 
+// Tiger is the resolver for the tiger field.
+func (r *sightingResolver) Tiger(ctx context.Context, obj *model.Sighting) (*model.Tiger, error) {
+	panic(fmt.Errorf("not implemented: Tiger - tiger"))
+}
+
+// User is the resolver for the user field.
+func (r *sightingResolver) User(ctx context.Context, obj *model.Sighting) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
 // Sightings is the resolver for the sightings field.
 func (r *tigerResolver) Sightings(ctx context.Context, obj *model.Tiger) ([]*model.Sighting, error) {
 	panic(fmt.Errorf("not implemented: Sightings - sightings"))
@@ -52,11 +62,13 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Sighting returns SightingResolver implementation.
+func (r *Resolver) Sighting() SightingResolver { return &sightingResolver{r} }
+
 // Tiger returns TigerResolver implementation.
 func (r *Resolver) Tiger() TigerResolver { return &tigerResolver{r} }
 
-type (
-	mutationResolver struct{ *Resolver }
-	queryResolver    struct{ *Resolver }
-	tigerResolver    struct{ *Resolver }
-)
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+type sightingResolver struct{ *Resolver }
+type tigerResolver struct{ *Resolver }

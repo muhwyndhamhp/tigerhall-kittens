@@ -19,13 +19,16 @@ type Sighting {
     date: Time!
     latitude: Float!
     longitude: Float!
+    tigerID: ID!
+    tiger: Tiger!
+    userID: ID!
+    user: User!
 }
 
 type User {
   id: ID!
   name: String!
   email: String!
-  hashedPassword: String!
 }
 
 type Query {
@@ -43,6 +46,7 @@ input NewTiger {
 
 input NewSighting {
   tigerID: ID!
+  userID: ID!
   date: Time!
   latitude: Float!
   longitude: Float!

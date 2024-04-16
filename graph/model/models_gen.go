@@ -11,6 +11,7 @@ type Mutation struct {
 
 type NewSighting struct {
 	TigerID   uint      `json:"tigerID"`
+	UserID    uint      `json:"userID"`
 	Date      time.Time `json:"date"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
@@ -38,6 +39,10 @@ type Sighting struct {
 	Date      time.Time `json:"date"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
+	TigerID   uint      `json:"tigerID"`
+	Tiger     *Tiger    `json:"tiger"`
+	UserID    uint      `json:"userID"`
+	User      *User     `json:"user"`
 }
 
 type Tiger struct {
@@ -51,8 +56,7 @@ type Tiger struct {
 }
 
 type User struct {
-	ID             uint   `json:"id"`
-	Name           string `json:"name"`
-	Email          string `json:"email"`
-	HashedPassword string `json:"hashedPassword"`
+	ID    uint   `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }

@@ -91,3 +91,9 @@ models:
     fields:
       sightings:
         resolver: true
+  Sighting:
+    fields:
+      tiger:
+        resolver: true
+      user:
+        resolver: true
