@@ -16,7 +16,6 @@ type Tiger {
 
 type Sighting {
     id: ID!
-    tiger: Tiger!
     date: Time!
     latitude: Float!
     longitude: Float!
@@ -31,7 +30,7 @@ type User {
 
 type Query {
   tigers(page: Int!, pageSize: Int): [Tiger!]!
-  sightings(tigerID: ID!, page: Int!, pageSize: Int!): [Sighting!]!
+  tiger(id: ID!): Tiger!
 }
 
 input NewTiger {

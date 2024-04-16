@@ -35,7 +35,6 @@ type Query struct {
 
 type Sighting struct {
 	ID        uint      `json:"id"`
-	Tiger     *Tiger    `json:"tiger"`
 	Date      time.Time `json:"date"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`

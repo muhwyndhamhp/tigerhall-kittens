@@ -36,8 +36,13 @@ func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize *int) ([]
 	panic(fmt.Errorf("not implemented: Tigers - tigers"))
 }
 
+// Tiger is the resolver for the tiger field.
+func (r *queryResolver) Tiger(ctx context.Context, id uint) (*model.Tiger, error) {
+	panic(fmt.Errorf("not implemented: Tiger - tiger"))
+}
+
 // Sightings is the resolver for the sightings field.
-func (r *queryResolver) Sightings(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
+func (r *tigerResolver) Sightings(ctx context.Context, obj *model.Tiger) ([]*model.Sighting, error) {
 	panic(fmt.Errorf("not implemented: Sightings - sightings"))
 }
 
@@ -47,7 +52,11 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Tiger returns TigerResolver implementation.
+func (r *Resolver) Tiger() TigerResolver { return &tigerResolver{r} }
+
 type (
 	mutationResolver struct{ *Resolver }
 	queryResolver    struct{ *Resolver }
+	tigerResolver    struct{ *Resolver }
 )
