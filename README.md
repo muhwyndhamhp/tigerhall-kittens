@@ -14,7 +14,7 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
 - ~~[ ] Create Migration mechanism (Probably using Automigrate Dry Run & gomigrate)~~
 - [x] Create Automigrate
 - [x] Create Auth Implementation using JWT and Middleware
-- [ ] Create CRUD for `User`, `Tiger`, and `Sighting` w/ Pagination
+- [x] Create CRUD for `User`, `Tiger`, and `Sighting` w/ Pagination
 - [ ] Implement Sighting Rules (Only Beyond 5 km from prev. Sightings)
 - [ ] Create Message Queue using Go Channel and Send Email Notification on Consumer Side
 - [ ] Add transaction for Create operations
