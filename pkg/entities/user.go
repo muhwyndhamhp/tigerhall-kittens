@@ -1,4 +1,4 @@
-package models
+package entities
 
 import (
 	"strconv"
@@ -15,6 +15,11 @@ type User struct {
 	Name         string `json:"name"`
 	Email        string `json:"email"`
 	PasswordHash string `json:"password_hash"`
+}
+
+type UserUsecase interface {
+	CreateUser(name, email, password string) (string, error)
+	Login(email, password string) (string, error)
 }
 
 type UserRepository interface {

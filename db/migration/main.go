@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/db"
-	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/models"
+	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"gorm.io/gorm"
 )
 
@@ -22,19 +22,18 @@ func main() {
 }
 
 func runAutoMigrate(d *gorm.DB) {
-	err := d.AutoMigrate(&models.User{})
+	err := d.AutoMigrate(&entities.User{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = d.AutoMigrate(&models.Tiger{})
+	err = d.AutoMigrate(&entities.Tiger{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = d.AutoMigrate(&models.Sighting{})
+	err = d.AutoMigrate(&entities.Sighting{})
 	if err != nil {
 		panic(err)
 	}
 }
-

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/models"
+	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
 var keyUser = &ctxKey{"user"}
@@ -13,7 +13,7 @@ type ctxKey struct {
 	name string
 }
 
-func AuthMiddleware(repo models.UserRepository) func(http.Handler) http.Handler {
+func AuthMiddleware(repo entities.UserRepository) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
@@ -22,7 +22,7 @@ func AuthMiddleware(repo models.UserRepository) func(http.Handler) http.Handler 
 				next.ServeHTTP(w, r)
 			}
 
-			tu, err := models.ParseToken(authHeader)
+			tu, err := entities.ParseToken(authHeader)
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
 				return
@@ -42,6 +42,6 @@ func AuthMiddleware(repo models.UserRepository) func(http.Handler) http.Handler 
 	}
 }
 
-func UserByCtx(ctx context.Context) *models.User {
-	return ctx.Value(keyUser).(*models.User)
+func UserByCtx(ctx context.Context) *entities.User {
+	return ctx.Value(keyUser).(*entities.User)
 }
