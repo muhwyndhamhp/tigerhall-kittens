@@ -2,12 +2,15 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"github.com/labstack/echo/v4"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
 var keyUser = &ctxKey{"user"}
+
+var ErrUserByCtxNotFound = errors.New("ErrUserByCtxNotFound: user not found in context")
 
 type ctxKey struct {
 	name string
@@ -43,38 +46,15 @@ func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
 	}
 }
 
-//
-// func AuthMiddleware(repo entities.UserRepository) func(http.Handler) http.Handler {
-// 	return func(next http.Handler) http.Handler {
-// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			authHeader := r.Header.Get("Authorization")
-//
-// 			if authHeader == "" {
-// 				next.ServeHTTP(w, r)
-// 			}
-//
-// 			tu, err := entities.ParseToken(authHeader)
-// 			if err != nil {
-// 				next.ServeHTTP(w, r)
-// 			}
-//
-// 			if tu == nil {
-// 				next.ServeHTTP(w, r)
-// 			}
-//
-// 			u, err := repo.FindByID(tu.ID)
-// 			if err != nil || u == nil {
-// 				next.ServeHTTP(w, r)
-// 			}
-//
-// 			ctx := context.WithValue(r.Context(), keyUser, u)
-// 			r = r.WithContext(ctx)
-//
-// 			next.ServeHTTP(w, r)
-// 		})
-// 	}
-// }
+func UserByCtx(ctx context.Context) (*entities.User, error) {
+	i := ctx.Value(keyUser)
+	if i == nil {
+		return nil, ErrUserByCtxNotFound
+	}
 
-func UserByCtx(ctx context.Context) *entities.User {
-	return ctx.Value(keyUser).(*entities.User)
+	v := i.(*entities.User)
+	if v == nil {
+		return nil, ErrUserByCtxNotFound
+	}
+	return v, nil
 }

@@ -24,3 +24,4 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
 - [ ] Create Dockerfile
 - [ ] Create Fly io Deployment
 - [ ] Fix Migration to use proper Migration Mechanism
+- [ ] Better Error Presentation (Maybe add extensions by appending error codes?)

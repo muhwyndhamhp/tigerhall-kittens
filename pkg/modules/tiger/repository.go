@@ -23,7 +23,11 @@ func (r *repo) Create(tiger *entities.Tiger) error {
 // FindAll implements entities.TigerRepository.
 func (r *repo) FindAll(page, pageSize int) ([]entities.Tiger, error) {
 	var res []entities.Tiger
-	err := r.db.Scopes(scopes.Paginate(page, pageSize)).Order("last_seen DESC").Find(&res).Error
+	err := r.db.
+		Scopes(scopes.Paginate(page, pageSize)).
+		Order("last_seen DESC").
+		Find(&res).
+		Error
 	if err != nil {
 		return nil, err
 	}

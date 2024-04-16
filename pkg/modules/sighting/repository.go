@@ -21,7 +21,12 @@ func (r *repo) Create(sighting *entities.Sighting) error {
 
 func (r *repo) FindByTigerID(tigerID uint, page, pageSize int) ([]entities.Sighting, error) {
 	var res []entities.Sighting
-	err := r.db.Scopes(scopes.Paginate(page, pageSize)).Where("tiger_id = ?", tigerID).Order("date DESC").Find(&res).Error
+	err := r.db.
+		Scopes(scopes.Paginate(page, pageSize)).
+		Where("tiger_id = ?", tigerID).
+		Order("date DESC").
+		Find(&res).
+		Error
 	if err != nil {
 		return nil, err
 	}

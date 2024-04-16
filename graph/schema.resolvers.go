@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
@@ -14,11 +13,11 @@ import (
 
 // CreateTiger is the resolver for the createTiger field.
 func (r *mutationResolver) CreateTiger(ctx context.Context, input model.NewTiger) (*model.Tiger, error) {
-	u := user.UserByCtx(ctx)
-	if u == nil {
-		// TODO: Change this to a proper error message
-		return nil, fmt.Errorf("unauthorized")
+	u, err := user.UserByCtx(ctx)
+	if err != nil {
+		return nil, err
 	}
+
 	t, err := r.tigerUsecase.CreateTiger(&model.Tiger{
 		Name:          input.Name,
 		DateOfBirth:   input.DateOfBirth,
@@ -35,10 +34,9 @@ func (r *mutationResolver) CreateTiger(ctx context.Context, input model.NewTiger
 
 // CreateSighting is the resolver for the createSighting field.
 func (r *mutationResolver) CreateSighting(ctx context.Context, input model.NewSighting) (*model.Sighting, error) {
-	u := user.UserByCtx(ctx)
-	if u == nil {
-		// TODO: Change this to a proper error message
-		return nil, fmt.Errorf("unauthorized")
+	u, err := user.UserByCtx(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	s, err := r.sightingUsecase.CreateSighting(&model.Sighting{
