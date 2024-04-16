@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	PORT                = "PORT"
 	ENV_FILE            = ".env"
 	LIBSQL_URL          = "LIBSQL_URL"
 	LIBSQL_TOKEN        = "LIBSQL_TOKEN"
