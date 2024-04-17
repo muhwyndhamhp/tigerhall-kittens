@@ -1,0 +1,14 @@
+with-expecter: false
+filename: "{{.InterfaceNameSnake}}_mock.go"
+dir: "{{.InterfaceDir}}/mocks"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+all: True 
+recursive: True
+packages:
+  github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities:
+    config:
+      all: True
+  github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client:
+    config:
+      all: True

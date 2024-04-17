@@ -16,3 +16,6 @@ dry-run-migrate:
 
 run:
 	@air run
+
+gen-mock:
+	@mockery --all 
