@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"context"
 	"time"
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
@@ -18,14 +19,14 @@ type Tiger struct {
 }
 
 type TigerUsecase interface {
-	CreateTiger(tiger *model.Tiger, userID uint) (*model.Tiger, error)
-	GetTigers(page, pageSize int) ([]*model.Tiger, error)
-	GetTigerByID(id uint) (*model.Tiger, error)
+	CreateTiger(ctx context.Context, tiger *model.NewTiger, userID uint) (*model.Tiger, error)
+	GetTigers(ctx context.Context, page, pageSize int) ([]*model.Tiger, error)
+	GetTigerByID(ctx context.Context, id uint) (*model.Tiger, error)
 }
 
 type TigerRepository interface {
-	Create(tiger *Tiger) error
-	FindAll(page, pageSize int) ([]Tiger, error)
-	FindByID(id uint) (*Tiger, error)
-	Update(tiger *Tiger, id uint) error
+	Create(ctx context.Context, tiger *Tiger) error
+	FindAll(ctx context.Context, page, pageSize int) ([]Tiger, error)
+	FindByID(ctx context.Context, id uint) (*Tiger, error)
+	Update(ctx context.Context, tiger *Tiger, id uint) error
 }

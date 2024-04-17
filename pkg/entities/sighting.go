@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -15,16 +16,20 @@ type Sighting struct {
 	Longitude float64   `json:"longitude"`
 	TigerID   uint      `json:"tiger_id"`
 	UserID    uint      `json:"user_id"`
+	ImageURL  string    `json:"image_url"`
 }
 
-var ErrTigerTooClose = errors.New("ErrTigerTooClose: tiger is too close, new sightings should be at least more than 5km away from the last sighting")
+var (
+	ErrTigerTooClose    = errors.New("ErrTigerTooClose: tiger is too close, new sightings should be at least more than 5km away from the last sighting")
+	ErrInvalidImageType = errors.New("ErrInvalidImageType: invalid image type, only jpeg, jpg, and png are allowed")
+)
 
 type SightingUsecase interface {
-	CreateSighting(sighting *model.Sighting) (*model.Sighting, error)
-	GetSightingsByTigerID(tigerID uint, page, pageSize int) ([]*model.Sighting, error)
+	CreateSighting(ctx context.Context, sighting *model.NewSighting, userID uint) (*model.Sighting, error)
+	GetSightingsByTigerID(ctx context.Context, tigerID uint, page, pageSize int) ([]*model.Sighting, error)
 }
 
 type SightingRepository interface {
-	Create(sighting *Sighting) error
-	FindByTigerID(tigerID uint, page, pageSize int) ([]Sighting, error)
+	Create(ctx context.Context, sighting *Sighting) error
+	FindByTigerID(ctx context.Context, tigerID uint, page, pageSize int) ([]Sighting, error)
 }

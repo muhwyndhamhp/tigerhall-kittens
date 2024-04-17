@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"context"
 	"errors"
 	"strconv"
 	"time"
@@ -20,15 +21,15 @@ type User struct {
 }
 
 type UserUsecase interface {
-	CreateUser(name, email, password string) (string, error)
-	Login(email, password string) (string, error)
-	GetUserByID(id uint) (*model.User, error)
+	CreateUser(ctx context.Context, usr *model.NewUser) (string, error)
+	Login(ctx context.Context, email, password string) (string, error)
+	GetUserByID(ctx context.Context, id uint) (*model.User, error)
 }
 
 type UserRepository interface {
-	Create(user *User) error
-	FindByEmail(email string) (*User, error)
-	FindByID(id uint) (*User, error)
+	Create(ctx context.Context, user *User) error
+	FindByEmail(ctx context.Context, email string) (*User, error)
+	FindByID(ctx context.Context, id uint) (*User, error)
 }
 
 var ErrUserByCtxNotFound = errors.New("ErrUserByCtxNotFound: user not found in context")
