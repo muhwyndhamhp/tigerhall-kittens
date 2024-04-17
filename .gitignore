@@ -1,4 +1,4 @@
 vendor
 .env
 tmp
-
+.DS_Store

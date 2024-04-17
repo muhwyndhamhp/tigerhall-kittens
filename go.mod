@@ -14,6 +14,7 @@ require (
 	github.com/kellydunn/golang-geo v0.7.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/renxzen/gorm-libsql v0.0.0-20240302231413-bea2dce63ac6
+	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
 	github.com/vektah/gqlparser/v2 v2.5.11
 	golang.org/x/crypto v0.22.0
 	gorm.io/gorm v1.25.9
@@ -53,6 +54,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/sosodev/duration v1.2.0 // indirect
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240220085343-4ae0eb9d0898 // indirect
 	github.com/urfave/cli/v2 v2.27.1 // indirect

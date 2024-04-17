@@ -12,6 +12,7 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tiger"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client"
 )
 
@@ -26,7 +27,7 @@ func main() {
 	e := echo.New()
 
 	d := db.GetDB()
-
+	em := email.NewEmailClient()
 	s3 := s3client.NewS3Client()
 
 	userRepo := user.NewUserRepository(d)
@@ -35,7 +36,7 @@ func main() {
 
 	userUsecase := user.NewUserUsecase(userRepo)
 	tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo)
-	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3)
+	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3, em)
 
 	resolver := graph.NewResolver(userUsecase, tigerUsecase, sightingUsecase)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))

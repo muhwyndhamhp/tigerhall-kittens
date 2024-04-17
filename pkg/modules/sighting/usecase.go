@@ -2,10 +2,13 @@ package sighting
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	geo "github.com/kellydunn/golang-geo"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/imageproc"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client"
 )
@@ -15,6 +18,7 @@ type usecase struct {
 	tigerRepo entities.TigerRepository
 	userRepo  entities.UserRepository
 	s3        *s3client.S3Client
+	em        *email.EmailClient
 }
 
 // CreateSighting implements entities.SightingUsecase.
@@ -81,6 +85,21 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 		return nil, err
 	}
 
+	go func() {
+		fmt.Println("Sending email")
+		err := u.em.SendSightingEmail(&email.SightingEmail{
+			DestinationEmail:  "kazeam.plus@gmail.com",
+			TigerName:         t.Name,
+			SightingDate:      s.Date.Format("2006-01-02 15:04:05"),
+			SightingLatitude:  fmt.Sprintf("%f", s.Latitude),
+			SightingLongitude: fmt.Sprintf("%f", s.Longitude),
+			ImageURL:          s.ImageURL,
+		})
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+
 	return &model.Sighting{
 		ID:        s.ID,
 		Date:      s.Date,
@@ -131,6 +150,7 @@ func NewSightingUsecase(
 	tigerRepo entities.TigerRepository,
 	userRepo entities.UserRepository,
 	s3 *s3client.S3Client,
+	em *email.EmailClient,
 ) entities.SightingUsecase {
-	return &usecase{repo, tigerRepo, userRepo, s3}
+	return &usecase{repo, tigerRepo, userRepo, s3, em}
 }
