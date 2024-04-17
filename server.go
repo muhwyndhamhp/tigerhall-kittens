@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"html/template"
 	"log"
+	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -46,11 +49,30 @@ func main() {
 	e.Use(user.AuthMiddleware(userRepo))
 	e.GET("/graphiql", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))
-	e.File("/altair.html", "public/altair.html")
+	e.GET("/altair", ServeAltair)
 
 	go em.QueueConsumer(queue)
 
 	log.Printf("connect to http://localhost:%s/graphiql for GraphiQL playground", port)
-	log.Printf("or connect to http://localhost:%s/altair.html for Altair", port)
+	log.Printf("or connect to http://localhost:%s/altair for Altair", port)
 	log.Fatal(e.Start(":" + port))
+}
+
+func ServeAltair(c echo.Context) error {
+	t, err := template.ParseFiles("public/altair.html")
+	if err != nil {
+		return err
+	}
+
+	var o bytes.Buffer
+	err = t.ExecuteTemplate(&o, "altair", map[string]interface{}{
+		"Endpoint": config.Get(config.BASE_URL) + "/query",
+	})
+	if err != nil {
+		return err
+	}
+
+	html := o.String()
+
+	return c.HTML(http.StatusOK, html)
 }

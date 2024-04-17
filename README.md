@@ -4,7 +4,7 @@
 This project is to fulfill my application as a Senior Backend Engineer at Tigerhall. 
 
 ## Demo
-You can access the demo at [https://tigerhall-kittens.fly.dev/altair.html](https://tigerhall-kittens.fly.dev/altair.html)
+You can access the demo at [https://tigerhall-kittens.fly.dev/altair](https://tigerhall-kittens.fly.dev/altair)
 
 ## Infrastructure Overview
 ![Infra Overview](schema.png)
