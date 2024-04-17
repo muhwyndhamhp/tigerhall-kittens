@@ -48,6 +48,11 @@ type Sighting struct {
 	ImageURL  *string   `json:"imageURL,omitempty"`
 }
 
+type SightingsPagination struct {
+	Sightings []*Sighting `json:"sightings"`
+	Total     int         `json:"total"`
+}
+
 type Tiger struct {
 	ID            uint        `json:"id"`
 	Name          string      `json:"name"`
@@ -56,6 +61,11 @@ type Tiger struct {
 	LastLatitude  float64     `json:"lastLatitude"`
 	LastLongitude float64     `json:"lastLongitude"`
 	Sightings     []*Sighting `json:"sightings"`
+}
+
+type TigerPagination struct {
+	Tigers []*Tiger `json:"tigers"`
+	Total  int      `json:"total"`
 }
 
 type User struct {

@@ -77,10 +77,10 @@ func (u *usecase) GetTigerByID(ctx context.Context, id uint) (*model.Tiger, erro
 }
 
 // GetTigers implements entities.TigerUsecase.
-func (u *usecase) GetTigers(ctx context.Context, page int, pageSize int) ([]*model.Tiger, error) {
-	tigers, err := u.repo.FindAll(ctx, page, pageSize)
+func (u *usecase) GetTigers(ctx context.Context, page int, pageSize int) ([]*model.Tiger, int, error) {
+	tigers, count, err := u.repo.FindAll(ctx, page, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	res := make([]*model.Tiger, len(tigers))
@@ -96,7 +96,7 @@ func (u *usecase) GetTigers(ctx context.Context, page int, pageSize int) ([]*mod
 		}
 	}
 
-	return res, nil
+	return res, count, nil
 }
 
 func NewTigerUsecase(repo entities.TigerRepository, sightingRepo entities.SightingRepository) entities.TigerUsecase {

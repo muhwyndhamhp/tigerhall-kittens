@@ -28,10 +28,10 @@ var (
 
 type SightingUsecase interface {
 	CreateSighting(ctx context.Context, sighting *model.NewSighting, userID uint) (*model.Sighting, error)
-	GetSightingsByTigerID(ctx context.Context, tigerID uint, page, pageSize int) ([]*model.Sighting, error)
+	GetSightingsByTigerID(ctx context.Context, tigerID uint, page, pageSize int) ([]*model.Sighting, int, error)
 }
 
 type SightingRepository interface {
 	Create(ctx context.Context, sighting *Sighting) error
-	FindByTigerID(ctx context.Context, tigerID uint, preloads []scopes.Preload, page, pageSize int) ([]Sighting, error)
+	FindByTigerID(ctx context.Context, tigerID uint, preloads []scopes.Preload, page, pageSize int) ([]Sighting, int, error)
 }

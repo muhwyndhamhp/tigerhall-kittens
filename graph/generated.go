@@ -74,6 +74,11 @@ type ComplexityRoot struct {
 		UserID    func(childComplexity int) int
 	}
 
+	SightingsPagination struct {
+		Sightings func(childComplexity int) int
+		Total     func(childComplexity int) int
+	}
+
 	Tiger struct {
 		DateOfBirth   func(childComplexity int) int
 		ID            func(childComplexity int) int
@@ -82,6 +87,11 @@ type ComplexityRoot struct {
 		LastSeen      func(childComplexity int) int
 		Name          func(childComplexity int) int
 		Sightings     func(childComplexity int) int
+	}
+
+	TigerPagination struct {
+		Tigers func(childComplexity int) int
+		Total  func(childComplexity int) int
 	}
 
 	User struct {
@@ -98,8 +108,8 @@ type MutationResolver interface {
 	Login(ctx context.Context, email string, password string) (string, error)
 }
 type QueryResolver interface {
-	Tigers(ctx context.Context, page int, pageSize int) ([]*model.Tiger, error)
-	SightingByTiger(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error)
+	Tigers(ctx context.Context, page int, pageSize int) (*model.TigerPagination, error)
+	SightingByTiger(ctx context.Context, tigerID uint, page int, pageSize int) (*model.SightingsPagination, error)
 }
 type SightingResolver interface {
 	Tiger(ctx context.Context, obj *model.Sighting) (*model.Tiger, error)
@@ -264,6 +274,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sighting.UserID(childComplexity), true
 
+	case "SightingsPagination.sightings":
+		if e.complexity.SightingsPagination.Sightings == nil {
+			break
+		}
+
+		return e.complexity.SightingsPagination.Sightings(childComplexity), true
+
+	case "SightingsPagination.total":
+		if e.complexity.SightingsPagination.Total == nil {
+			break
+		}
+
+		return e.complexity.SightingsPagination.Total(childComplexity), true
+
 	case "Tiger.dateOfBirth":
 		if e.complexity.Tiger.DateOfBirth == nil {
 			break
@@ -312,6 +336,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tiger.Sightings(childComplexity), true
+
+	case "TigerPagination.tigers":
+		if e.complexity.TigerPagination.Tigers == nil {
+			break
+		}
+
+		return e.complexity.TigerPagination.Tigers(childComplexity), true
+
+	case "TigerPagination.total":
+		if e.complexity.TigerPagination.Total == nil {
+			break
+		}
+
+		return e.complexity.TigerPagination.Total(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -922,9 +960,9 @@ func (ec *executionContext) _Query_tigers(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Tiger)
+	res := resTmp.(*model.TigerPagination)
 	fc.Result = res
-	return ec.marshalNTiger2ᚕᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐTigerᚄ(ctx, field.Selections, res)
+	return ec.marshalNTigerPagination2ᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐTigerPagination(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_tigers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -935,22 +973,12 @@ func (ec *executionContext) fieldContext_Query_tigers(ctx context.Context, field
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Tiger_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Tiger_name(ctx, field)
-			case "dateOfBirth":
-				return ec.fieldContext_Tiger_dateOfBirth(ctx, field)
-			case "lastSeen":
-				return ec.fieldContext_Tiger_lastSeen(ctx, field)
-			case "lastLatitude":
-				return ec.fieldContext_Tiger_lastLatitude(ctx, field)
-			case "lastLongitude":
-				return ec.fieldContext_Tiger_lastLongitude(ctx, field)
-			case "sightings":
-				return ec.fieldContext_Tiger_sightings(ctx, field)
+			case "tigers":
+				return ec.fieldContext_TigerPagination_tigers(ctx, field)
+			case "total":
+				return ec.fieldContext_TigerPagination_total(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Tiger", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type TigerPagination", field.Name)
 		},
 	}
 	defer func() {
@@ -993,9 +1021,9 @@ func (ec *executionContext) _Query_sightingByTiger(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Sighting)
+	res := resTmp.(*model.SightingsPagination)
 	fc.Result = res
-	return ec.marshalNSighting2ᚕᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐSightingᚄ(ctx, field.Selections, res)
+	return ec.marshalNSightingsPagination2ᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐSightingsPagination(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_sightingByTiger(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1006,26 +1034,12 @@ func (ec *executionContext) fieldContext_Query_sightingByTiger(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Sighting_id(ctx, field)
-			case "date":
-				return ec.fieldContext_Sighting_date(ctx, field)
-			case "latitude":
-				return ec.fieldContext_Sighting_latitude(ctx, field)
-			case "longitude":
-				return ec.fieldContext_Sighting_longitude(ctx, field)
-			case "tigerID":
-				return ec.fieldContext_Sighting_tigerID(ctx, field)
-			case "tiger":
-				return ec.fieldContext_Sighting_tiger(ctx, field)
-			case "userID":
-				return ec.fieldContext_Sighting_userID(ctx, field)
-			case "user":
-				return ec.fieldContext_Sighting_user(ctx, field)
-			case "imageURL":
-				return ec.fieldContext_Sighting_imageURL(ctx, field)
+			case "sightings":
+				return ec.fieldContext_SightingsPagination_sightings(ctx, field)
+			case "total":
+				return ec.fieldContext_SightingsPagination_total(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Sighting", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type SightingsPagination", field.Name)
 		},
 	}
 	defer func() {
@@ -1588,6 +1602,114 @@ func (ec *executionContext) fieldContext_Sighting_imageURL(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _SightingsPagination_sightings(ctx context.Context, field graphql.CollectedField, obj *model.SightingsPagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SightingsPagination_sightings(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Sightings, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Sighting)
+	fc.Result = res
+	return ec.marshalNSighting2ᚕᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐSightingᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SightingsPagination_sightings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SightingsPagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Sighting_id(ctx, field)
+			case "date":
+				return ec.fieldContext_Sighting_date(ctx, field)
+			case "latitude":
+				return ec.fieldContext_Sighting_latitude(ctx, field)
+			case "longitude":
+				return ec.fieldContext_Sighting_longitude(ctx, field)
+			case "tigerID":
+				return ec.fieldContext_Sighting_tigerID(ctx, field)
+			case "tiger":
+				return ec.fieldContext_Sighting_tiger(ctx, field)
+			case "userID":
+				return ec.fieldContext_Sighting_userID(ctx, field)
+			case "user":
+				return ec.fieldContext_Sighting_user(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Sighting_imageURL(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Sighting", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SightingsPagination_total(ctx context.Context, field graphql.CollectedField, obj *model.SightingsPagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SightingsPagination_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SightingsPagination_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SightingsPagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Tiger_id(ctx context.Context, field graphql.CollectedField, obj *model.Tiger) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Tiger_id(ctx, field)
 	if err != nil {
@@ -1911,6 +2033,110 @@ func (ec *executionContext) fieldContext_Tiger_sightings(ctx context.Context, fi
 				return ec.fieldContext_Sighting_imageURL(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Sighting", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TigerPagination_tigers(ctx context.Context, field graphql.CollectedField, obj *model.TigerPagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TigerPagination_tigers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tigers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tiger)
+	fc.Result = res
+	return ec.marshalNTiger2ᚕᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐTigerᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TigerPagination_tigers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TigerPagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Tiger_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Tiger_name(ctx, field)
+			case "dateOfBirth":
+				return ec.fieldContext_Tiger_dateOfBirth(ctx, field)
+			case "lastSeen":
+				return ec.fieldContext_Tiger_lastSeen(ctx, field)
+			case "lastLatitude":
+				return ec.fieldContext_Tiger_lastLatitude(ctx, field)
+			case "lastLongitude":
+				return ec.fieldContext_Tiger_lastLongitude(ctx, field)
+			case "sightings":
+				return ec.fieldContext_Tiger_sightings(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tiger", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TigerPagination_total(ctx context.Context, field graphql.CollectedField, obj *model.TigerPagination) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TigerPagination_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TigerPagination_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TigerPagination",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4282,6 +4508,50 @@ func (ec *executionContext) _Sighting(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
+var sightingsPaginationImplementors = []string{"SightingsPagination"}
+
+func (ec *executionContext) _SightingsPagination(ctx context.Context, sel ast.SelectionSet, obj *model.SightingsPagination) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, sightingsPaginationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SightingsPagination")
+		case "sightings":
+			out.Values[i] = ec._SightingsPagination_sightings(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total":
+			out.Values[i] = ec._SightingsPagination_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var tigerImplementors = []string{"Tiger"}
 
 func (ec *executionContext) _Tiger(ctx context.Context, sel ast.SelectionSet, obj *model.Tiger) graphql.Marshaler {
@@ -4359,6 +4629,50 @@ func (ec *executionContext) _Tiger(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var tigerPaginationImplementors = []string{"TigerPagination"}
+
+func (ec *executionContext) _TigerPagination(ctx context.Context, sel ast.SelectionSet, obj *model.TigerPagination) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tigerPaginationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TigerPagination")
+		case "tigers":
+			out.Values[i] = ec._TigerPagination_tigers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "total":
+			out.Values[i] = ec._TigerPagination_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4890,6 +5204,20 @@ func (ec *executionContext) marshalNSighting2ᚖgithubᚗcomᚋmuhwyndhamhpᚋti
 	return ec._Sighting(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNSightingsPagination2githubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐSightingsPagination(ctx context.Context, sel ast.SelectionSet, v model.SightingsPagination) graphql.Marshaler {
+	return ec._SightingsPagination(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSightingsPagination2ᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐSightingsPagination(ctx context.Context, sel ast.SelectionSet, v *model.SightingsPagination) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SightingsPagination(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4961,6 +5289,20 @@ func (ec *executionContext) marshalNTiger2ᚖgithubᚗcomᚋmuhwyndhamhpᚋtiger
 		return graphql.Null
 	}
 	return ec._Tiger(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTigerPagination2githubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐTigerPagination(ctx context.Context, sel ast.SelectionSet, v model.TigerPagination) graphql.Marshaler {
+	return ec._TigerPagination(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTigerPagination2ᚖgithubᚗcomᚋmuhwyndhamhpᚋtigerhallᚑkittensᚋgraphᚋmodelᚐTigerPagination(ctx context.Context, sel ast.SelectionSet, v *model.TigerPagination) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TigerPagination(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {

@@ -21,11 +21,25 @@ func (r *repo) Create(ctx context.Context, sighting *entities.Sighting) error {
 	return nil
 }
 
-func (r *repo) FindByTigerID(ctx context.Context, tigerID uint, preloads []scopes.Preload, page, pageSize int) ([]entities.Sighting, error) {
+func (r *repo) FindByTigerID(
+	ctx context.Context,
+	tigerID uint,
+	preloads []scopes.Preload,
+	page, pageSize int,
+) ([]entities.Sighting, int, error) {
 	var res []entities.Sighting
 
 	q := r.db.
 		WithContext(ctx).
+		Model(&entities.Sighting{})
+
+	var count int64
+	err := q.Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	q = q.
 		Scopes(scopes.Paginate(page, pageSize)).
 		Where("tiger_id = ?", tigerID).
 		Order("date DESC")
@@ -34,14 +48,14 @@ func (r *repo) FindByTigerID(ctx context.Context, tigerID uint, preloads []scope
 		q = q.Scopes(scopes.Preloads(preloads...))
 	}
 
-	err := q.
+	err = q.
 		Find(&res).
 		Error
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return res, nil
+	return res, int(count), nil
 }
 
 func NewSightingRepository(db *gorm.DB) entities.SightingRepository {

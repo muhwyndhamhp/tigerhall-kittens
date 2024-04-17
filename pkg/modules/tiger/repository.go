@@ -23,19 +23,29 @@ func (r *repo) Create(ctx context.Context, tiger *entities.Tiger) error {
 }
 
 // FindAll implements entities.TigerRepository.
-func (r *repo) FindAll(ctx context.Context, page, pageSize int) ([]entities.Tiger, error) {
+func (r *repo) FindAll(ctx context.Context, page, pageSize int) ([]entities.Tiger, int, error) {
 	var res []entities.Tiger
-	err := r.db.
+	var count int64
+
+	q := r.db.
 		WithContext(ctx).
+		Model(&entities.Tiger{})
+
+	err := q.Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = q.
 		Scopes(scopes.Paginate(page, pageSize)).
 		Order("last_seen DESC").
 		Find(&res).
 		Error
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return res, nil
+	return res, int(count), nil
 }
 
 // FindByID implements entities.TigerRepository.

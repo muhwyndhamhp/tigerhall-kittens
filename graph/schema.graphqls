@@ -33,9 +33,19 @@ type User {
   email: String!
 }
 
+type TigerPagination {
+  tigers: [Tiger!]!
+  total: Int!
+}
+
+type SightingsPagination {
+  sightings: [Sighting!]!
+  total: Int!
+}
+
 type Query {
-  tigers(page: Int!, pageSize: Int!): [Tiger!]!
-  sightingByTiger(tigerID: ID!, page:Int!, pageSize: Int!): [Sighting!]!
+  tigers(page: Int!, pageSize: Int!): TigerPagination!
+  sightingByTiger(tigerID: ID!, page:Int!, pageSize: Int!): SightingsPagination!
 }
 
 input NewTiger {

@@ -62,23 +62,29 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 }
 
 // Tigers is the resolver for the tigers field.
-func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize int) ([]*model.Tiger, error) {
-	tigers, err := r.tigerUsecase.GetTigers(ctx, page, pageSize)
+func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize int) (*model.TigerPagination, error) {
+	tigers, count, err := r.tigerUsecase.GetTigers(ctx, page, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	return tigers, nil
+	return &model.TigerPagination{
+		Tigers: tigers,
+		Total:  count,
+	}, nil
 }
 
 // SightingByTiger is the resolver for the sightingByTiger field.
-func (r *queryResolver) SightingByTiger(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
-	sightings, err := r.sightingUsecase.GetSightingsByTigerID(ctx, tigerID, page, pageSize)
+func (r *queryResolver) SightingByTiger(ctx context.Context, tigerID uint, page int, pageSize int) (*model.SightingsPagination, error) {
+	sightings, count, err := r.sightingUsecase.GetSightingsByTigerID(ctx, tigerID, page, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	return sightings, nil
+	return &model.SightingsPagination{
+		Sightings: sightings,
+		Total:     count,
+	}, nil
 }
 
 // Tiger is the resolver for the tiger field.
@@ -115,7 +121,7 @@ func (r *tigerResolver) Sightings(ctx context.Context, obj *model.Tiger) ([]*mod
 		return nil, nil
 	}
 
-	sightings, err := r.sightingUsecase.GetSightingsByTigerID(ctx, obj.ID, 0, 0)
+	sightings, _, err := r.sightingUsecase.GetSightingsByTigerID(ctx, obj.ID, 0, 0)
 	if err != nil {
 		return nil, err
 	}

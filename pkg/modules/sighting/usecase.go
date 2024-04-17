@@ -23,7 +23,7 @@ type usecase struct {
 
 // CreateSighting implements entities.SightingUsecase.
 func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSighting, userID uint) (*model.Sighting, error) {
-	ls, err := u.repo.FindByTigerID(ctx, sighting.TigerID, []scopes.Preload{}, 1, 1)
+	ls, _, err := u.repo.FindByTigerID(ctx, sighting.TigerID, []scopes.Preload{}, 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (u *usecase) queueEmail(t *entities.Tiger) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	sh, err := u.repo.FindByTigerID(ctx, t.ID, []scopes.Preload{
+	sh, _, err := u.repo.FindByTigerID(ctx, t.ID, []scopes.Preload{
 		{
 			Key:       "User",
 			Statement: "",
@@ -147,10 +147,10 @@ func (u *usecase) queueEmail(t *entities.Tiger) {
 }
 
 // GetSightingsByTigerID implements entities.SightingUsecase.
-func (u *usecase) GetSightingsByTigerID(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
-	sightings, err := u.repo.FindByTigerID(ctx, tigerID, []scopes.Preload{}, page, pageSize)
+func (u *usecase) GetSightingsByTigerID(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, int, error) {
+	sightings, count, err := u.repo.FindByTigerID(ctx, tigerID, []scopes.Preload{}, page, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var result []*model.Sighting
@@ -165,7 +165,7 @@ func (u *usecase) GetSightingsByTigerID(ctx context.Context, tigerID uint, page 
 			ImageURL:  &s.ImageURL,
 		})
 	}
-	return result, nil
+	return result, count, nil
 }
 
 func NewSightingUsecase(
