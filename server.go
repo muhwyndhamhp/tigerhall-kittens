@@ -46,5 +46,6 @@ func main() {
 	e.File("/altair.html", "public/altair.html")
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Printf("Or connect to http://localhost:%s/altair.html for Altair", port)
 	log.Fatal(e.Start(":" + port))
 }
