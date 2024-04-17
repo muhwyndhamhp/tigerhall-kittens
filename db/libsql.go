@@ -17,7 +17,14 @@ func GetDB() *gorm.DB {
 		url := config.Get(config.LIBSQL_URL)
 		auth := config.Get(config.LIBSQL_TOKEN)
 
-		d, err := gorm.Open(libsql.Open(fmt.Sprintf("%s?authToken=%s", url, auth)), &gorm.Config{})
+		str := ""
+		if url == "" {
+			str = "file:db/kittens.db"
+		} else {
+			str = fmt.Sprintf("%s?authToken=%s", url, auth)
+		}
+
+		d, err := gorm.Open(libsql.Open(str), &gorm.Config{})
 		if err != nil {
 			panic(err)
 		}
