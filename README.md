@@ -3,6 +3,9 @@
 ## Introduction
 This project is to fulfill my application as a Senior Backend Engineer at Tigerhall. 
 
+## Demo
+You can access the demo at [https://tigerhall-kittens.fly.dev/altair.html](https://tigerhall-kittens.fly.dev/altair.html)
+
 ## Infrastructure Overview
 ![Infra Overview](schema.png)
 
@@ -25,7 +28,7 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
   - [x] Create Unit Test for Tiger
 - [ ] Create Integration Test for Each Endpoint
 - [x] Create Documentation
-- [ ] Create Dockerfile
-- [ ] Create Fly io Deployment
+- [x] Create Dockerfile
+- [x] Create Fly io Deployment
 - [ ] Fix Migration to use proper Migration Mechanism
 - [ ] Better Error Presentation (Maybe add extensions by appending error codes?)
