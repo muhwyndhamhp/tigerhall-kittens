@@ -1,0 +1,25 @@
+# fly.toml app configuration file generated for tigerhall-kittens on 2024-04-17T20:12:12+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'tigerhall-kittens'
+primary_region = 'sin'
+
+[build]
+  [build.args]
+    GO_VERSION = '1.22.1'
+
+[env]
+  PORT = '8080'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
