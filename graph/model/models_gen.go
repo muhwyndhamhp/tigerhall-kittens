@@ -4,16 +4,19 @@ package model
 
 import (
 	"time"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 type Mutation struct {
 }
 
 type NewSighting struct {
-	TigerID   uint      `json:"tigerID"`
-	Date      time.Time `json:"date"`
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
+	TigerID   uint            `json:"tigerID"`
+	Date      time.Time       `json:"date"`
+	Latitude  float64         `json:"latitude"`
+	Longitude float64         `json:"longitude"`
+	Image     *graphql.Upload `json:"image,omitempty"`
 }
 
 type NewTiger struct {

@@ -3,6 +3,7 @@
 # https://gqlgen.com/getting-started/
 
 scalar Time
+scalar Upload
 
 type Tiger {
     id: ID!
@@ -49,6 +50,7 @@ input NewSighting {
   date: Time!
   latitude: Float!
   longitude: Float!
+  image: Upload
 }
 
 input NewUser {
