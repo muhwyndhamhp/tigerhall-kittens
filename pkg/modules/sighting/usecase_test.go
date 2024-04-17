@@ -2,6 +2,7 @@ package sighting
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -42,6 +43,27 @@ func TestUsecase_CreateSighting(t *testing.T) {
 		wantCh  *email.SightingEmail
 	}{
 		{
+			name:        "should return err given failed to fetch tiger",
+			getTigerErr: errors.New(""),
+			wantErr:     errors.New(""),
+		},
+		{
+			name: "should return ErrTigerTooClose given latitude and longitude is less than 5.0 km from previous sighting",
+			getTigerResp: &entities.Tiger{
+				Model: gorm.Model{
+					ID:        101,
+					CreatedAt: now,
+					UpdatedAt: now,
+				},
+				Name:          "tiger-1",
+				DateOfBirth:   now,
+				LastSeen:      now,
+				LastLatitude:  -7.550676,
+				LastLongitude: 110.828316,
+			},
+			wantErr: entities.ErrTigerTooClose,
+		},
+		{
 			name:              "should return valid model.Sighting given valid input without image and send email",
 			createSightingErr: nil,
 			getTigerResp: &entities.Tiger{
@@ -56,8 +78,6 @@ func TestUsecase_CreateSighting(t *testing.T) {
 				LastLatitude:  -7.250676,
 				LastLongitude: 110.828316,
 			},
-			getTigerErr:    nil,
-			updateTigerErr: nil,
 			emailFindByTigerResp: []entities.Sighting{
 				{
 					Date:      now,
@@ -70,7 +90,6 @@ func TestUsecase_CreateSighting(t *testing.T) {
 					},
 				},
 			},
-			emailFindByTigerErr: nil,
 			want: &model.Sighting{
 				ID:        0,
 				Date:      now,
@@ -80,7 +99,6 @@ func TestUsecase_CreateSighting(t *testing.T) {
 				UserID:    201,
 				ImageURL:  nil,
 			},
-			wantErr: nil,
 			wantCh: &email.SightingEmail{
 				DestinationEmail:  "mail-1@example.com",
 				TigerName:         "tiger-1",
@@ -90,8 +108,7 @@ func TestUsecase_CreateSighting(t *testing.T) {
 			},
 		},
 		{
-			name:              "should return valid model.Sighting given valid input without image and send no email",
-			createSightingErr: nil,
+			name: "should return valid model.Sighting given valid input without image and send no email",
 			getTigerResp: &entities.Tiger{
 				Model: gorm.Model{
 					ID:        101,
@@ -104,10 +121,7 @@ func TestUsecase_CreateSighting(t *testing.T) {
 				LastLatitude:  -7.250676,
 				LastLongitude: 110.828316,
 			},
-			getTigerErr:          nil,
-			updateTigerErr:       nil,
 			emailFindByTigerResp: []entities.Sighting{},
-			emailFindByTigerErr:  nil,
 			want: &model.Sighting{
 				ID:        0,
 				Date:      now,
@@ -117,8 +131,6 @@ func TestUsecase_CreateSighting(t *testing.T) {
 				UserID:    201,
 				ImageURL:  nil,
 			},
-			wantErr: nil,
-			wantCh:  nil,
 		},
 	}
 
@@ -166,6 +178,74 @@ func TestUsecase_CreateSighting(t *testing.T) {
 
 			assert.Equal(t, tc.wantErr, err)
 			assert.Equal(t, tc.want, res)
+		})
+	}
+}
+
+func TestUsecase_GetSightingByTigerID(t *testing.T) {
+	now := time.Now()
+	testCases := []struct {
+		name string
+
+		getSightingsByTigerIDResp []entities.Sighting
+		getSightingsByTigerIDErr  error
+
+		want    []*model.Sighting
+		wantErr error
+	}{
+		{
+			name: "should return valid []*model.Sighting given valid input",
+			getSightingsByTigerIDResp: []entities.Sighting{
+				{
+					Model: gorm.Model{
+						ID:        301,
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
+					Date:      now,
+					Latitude:  -7.550676,
+					Longitude: 110.828316,
+					TigerID:   101,
+					UserID:    201,
+				},
+			},
+			getSightingsByTigerIDErr: nil,
+			want: []*model.Sighting{
+				{
+					ID:        301,
+					Date:      now,
+					Latitude:  -7.550676,
+					Longitude: 110.828316,
+					TigerID:   101,
+					UserID:    201,
+					ImageURL:  new(string),
+				},
+			},
+			wantErr: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			repo := mocks.NewSightingRepository(t)
+			tigerRepo := mocks.NewTigerRepository(t)
+			userRepo := mocks.NewUserRepository(t)
+
+			s3 := s3mocks.NewS3ClientInterface(t)
+			ch := make(chan email.SightingEmail)
+
+			usecase := NewSightingUsecase(repo, tigerRepo, userRepo, s3, ch)
+
+			repo.
+				On("FindByTigerID", mock.Anything, uint(101), mock.Anything, 1, 1000).
+				Return(tc.getSightingsByTigerIDResp, len(tc.getSightingsByTigerIDResp), tc.getSightingsByTigerIDErr).
+				Maybe()
+
+			res, count, err := usecase.GetSightingsByTigerID(context.Background(), 101, 1, 1000)
+
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, res)
+			assert.Equal(t, len(tc.want), count)
 		})
 	}
 }
