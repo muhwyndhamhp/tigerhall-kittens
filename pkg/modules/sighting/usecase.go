@@ -173,7 +173,6 @@ func NewSightingUsecase(
 	tigerRepo entities.TigerRepository,
 	userRepo entities.UserRepository,
 	s3 *s3client.S3Client,
-	em *email.EmailClient,
 	ch chan<- email.SightingEmail,
 ) entities.SightingUsecase {
 	return &usecase{repo, tigerRepo, userRepo, s3, ch}

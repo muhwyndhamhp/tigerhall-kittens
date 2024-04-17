@@ -38,7 +38,7 @@ func main() {
 
 	userUsecase := user.NewUserUsecase(userRepo)
 	tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo)
-	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3, em, queue)
+	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3, queue)
 
 	resolver := graph.NewResolver(userUsecase, tigerUsecase, sightingUsecase)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
