@@ -50,6 +50,7 @@ func main() {
 	e.GET("/graphiql", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))
 	e.GET("/altair", ServeAltair)
+	e.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusMovedPermanently, "/altair") })
 
 	go em.QueueConsumer(queue)
 
