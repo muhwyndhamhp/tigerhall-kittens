@@ -38,6 +38,8 @@ type NewTiger struct {
 	LastLatitude float64 `json:"lastLatitude"`
 	// This is the last seen longitude of the tiger. This should indicate the last known location of the tiger when the tiger profile is created. It will be updated every time a new sighting is added for the tiger.
 	LastLongitude float64 `json:"lastLongitude"`
+	// This is the Multi-Part scalar for uploading image of the tiger. It is an optional field.
+	Image *graphql.Upload `json:"image,omitempty"`
 }
 
 // Input type for creating a new user profile.

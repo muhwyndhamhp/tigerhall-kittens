@@ -4193,7 +4193,7 @@ func (ec *executionContext) unmarshalInputNewTiger(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "dateOfBirth", "lastSeen", "lastLatitude", "lastLongitude"}
+	fieldsInOrder := [...]string{"name", "dateOfBirth", "lastSeen", "lastLatitude", "lastLongitude", "image"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4235,6 +4235,13 @@ func (ec *executionContext) unmarshalInputNewTiger(ctx context.Context, obj inte
 				return it, err
 			}
 			it.LastLongitude = data
+		case "image":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+			data, err := ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Image = data
 		}
 	}
 
