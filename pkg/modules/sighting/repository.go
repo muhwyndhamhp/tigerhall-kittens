@@ -29,9 +29,9 @@ func (r *repo) FindByTigerID(
 ) ([]entities.Sighting, int, error) {
 	var res []entities.Sighting
 
-	q := r.db.
-		WithContext(ctx).
-		Model(&entities.Sighting{})
+	q := r.db.WithContext(ctx).
+		Model(&entities.Sighting{}).
+		Where("tiger_id = ?", tigerID)
 
 	var count int64
 	err := q.Count(&count).Error
@@ -39,18 +39,13 @@ func (r *repo) FindByTigerID(
 		return nil, 0, err
 	}
 
-	q = q.
-		Scopes(scopes.Paginate(page, pageSize)).
-		Where("tiger_id = ?", tigerID).
-		Order("date DESC")
+	q = q.Scopes(scopes.Paginate(page, pageSize)).Order("date DESC")
 
 	if len(preloads) > 0 {
 		q = q.Scopes(scopes.Preloads(preloads...))
 	}
 
-	err = q.
-		Find(&res).
-		Error
+	err = q.Find(&res).Error
 	if err != nil {
 		return nil, 0, err
 	}
