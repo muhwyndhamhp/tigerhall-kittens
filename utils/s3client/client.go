@@ -47,9 +47,10 @@ func NewS3Client() *S3Client {
 }
 
 func (c *S3Client) UploadImage(ctx context.Context, r *bytes.Reader, filename, contentType string, size int64) (string, error) {
+	filename = AppendTimestamp(filename)
 	obj := &s3.PutObjectInput{
 		Bucket:        aws.String(defaultBucketName),
-		Key:           aws.String(AppendTimestamp(filename)),
+		Key:           aws.String(filename),
 		ContentType:   aws.String("image/jpeg"),
 		Body:          r,
 		ContentLength: aws.Int64(size),
