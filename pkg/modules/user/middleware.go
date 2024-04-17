@@ -39,10 +39,6 @@ func ExtractUserFromJWT(ctx context.Context, repo entities.UserRepository, authH
 		return nil, err
 	}
 
-	if tu == nil {
-		return nil, entities.ErrUserByCtxNotFound
-	}
-
 	u, err := repo.FindByID(ctx, tu.ID)
 	if err != nil || u == nil {
 		return nil, entities.ErrUserByCtxNotFound
@@ -58,8 +54,5 @@ func UserByCtx(ctx context.Context) (*entities.User, error) {
 	}
 
 	v := i.(*entities.User)
-	if v == nil {
-		return nil, entities.ErrUserByCtxNotFound
-	}
 	return v, nil
 }

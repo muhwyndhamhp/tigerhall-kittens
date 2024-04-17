@@ -58,9 +58,15 @@ func (u *User) ValidatePassword(password string) error {
 	return nil
 }
 
-// JWT Implementation
-var secretKey = []byte(config.Get(config.JWT_SECRET))
+func GetSecretKey() []byte {
+	secretStr := config.Get(config.JWT_SECRET)
+	if secretStr == "" {
+		secretStr = "MuhWyndham-TigerHall-Kittens-Test"
+	}
+	return []byte(secretStr)
+}
 
+// JWT Implementation
 func (u *User) GenerateToken() (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
@@ -79,7 +85,7 @@ func (u *User) GenerateToken() (string, error) {
 	claims["username"] = u.Name
 	claims["email"] = u.Email
 	claims["exp"] = timex.Now().Add(time.Second * time.Duration(exp)).Unix()
-	ts, err := token.SignedString(secretKey)
+	ts, err := token.SignedString(GetSecretKey())
 	if err != nil {
 		return "", err
 	}
@@ -89,7 +95,7 @@ func (u *User) GenerateToken() (string, error) {
 
 func ParseToken(tokenString string) (*User, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return secretKey, nil
+		return GetSecretKey(), nil
 	})
 	if err != nil {
 		return nil, err

@@ -37,7 +37,7 @@ func TestUsecase_CreateUser(t *testing.T) {
 			},
 			findByEmailErr: gorm.ErrRecordNotFound,
 			createErr:      nil,
-			want:           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Hjcf56Yd3_JDtEI9Ov1VAq-ujwK4s3CIaXiSNWHkPME",
+			want:           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
 			wantErr:        nil,
 		},
 	}
@@ -88,7 +88,7 @@ func TestUsecase_Login(t *testing.T) {
 			password:       "inipasswordnya!",
 			findByEmailErr: nil,
 			validateErr:    nil,
-			want:           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Hjcf56Yd3_JDtEI9Ov1VAq-ujwK4s3CIaXiSNWHkPME",
+			want:           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
 			wantErr:        nil,
 		},
 	}
@@ -179,10 +179,10 @@ func TestUsecase_RefreshToken(t *testing.T) {
 	}{
 		{
 			name:          "should return token and nil error",
-			token:         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Hjcf56Yd3_JDtEI9Ov1VAq-ujwK4s3CIaXiSNWHkPME",
+			token:         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
 			parseTokenErr: nil,
 			findByIDErr:   nil,
-			want:          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Hjcf56Yd3_JDtEI9Ov1VAq-ujwK4s3CIaXiSNWHkPME",
+			want:          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
 			wantErr:       nil,
 		},
 	}
