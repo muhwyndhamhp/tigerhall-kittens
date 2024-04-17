@@ -47,14 +47,6 @@ func (u *usecase) CreateTiger(ctx context.Context, tiger *model.NewTiger, userID
 		LastSeen:      t.LastSeen,
 		LastLatitude:  t.LastLatitude,
 		LastLongitude: t.LastLongitude,
-		Sightings: []*model.Sighting{
-			{
-				Date:      sighting.Date,
-				Latitude:  sighting.Latitude,
-				Longitude: sighting.Longitude,
-				UserID:    sighting.UserID,
-			},
-		},
 	}, nil
 }
 
