@@ -1,20 +1,25 @@
 package sighting
 
 import (
+	"context"
+
 	geo "github.com/kellydunn/golang-geo"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/imageproc"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client"
 )
 
 type usecase struct {
 	repo      entities.SightingRepository
 	tigerRepo entities.TigerRepository
 	userRepo  entities.UserRepository
+	s3        *s3client.S3Client
 }
 
 // CreateSighting implements entities.SightingUsecase.
-func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, error) {
-	ls, err := u.repo.FindByTigerID(sighting.TigerID, 1, 1)
+func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSighting, userID uint) (*model.Sighting, error) {
+	ls, err := u.repo.FindByTigerID(ctx, sighting.TigerID, 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -26,20 +31,38 @@ func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, err
 			return nil, entities.ErrTigerTooClose
 		}
 	}
+
 	s := entities.Sighting{
 		Date:      sighting.Date,
 		Latitude:  sighting.Latitude,
 		Longitude: sighting.Longitude,
 		TigerID:   sighting.TigerID,
-		UserID:    sighting.UserID,
+		UserID:    userID,
+	}
+	if sighting.Image != nil {
+		if !imageproc.IsContentTypeValid(sighting.Image.ContentType, sighting.Image.Filename) {
+			return nil, entities.ErrInvalidImageType
+		}
+
+		r, size, err := imageproc.ResizeImage(sighting.Image.File, sighting.Image.Filename)
+		if err != nil {
+			return nil, err
+		}
+
+		url, err := u.s3.UploadImage(ctx, r, sighting.Image.Filename, sighting.Image.ContentType, int64(size))
+		if err != nil {
+			return nil, err
+		}
+
+		s.ImageURL = url
 	}
 
-	err = u.repo.Create(&s)
+	err = u.repo.Create(ctx, &s)
 	if err != nil {
 		return nil, err
 	}
 
-	t, err := u.tigerRepo.FindByID(s.TigerID)
+	t, err := u.tigerRepo.FindByID(ctx, s.TigerID)
 	if err != nil {
 		return nil, err
 	}
@@ -48,12 +71,12 @@ func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, err
 	t.LastLatitude = s.Latitude
 	t.LastLongitude = s.Longitude
 
-	err = u.tigerRepo.Update(t, t.ID)
+	err = u.tigerRepo.Update(ctx, t, t.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	usr, err := u.userRepo.FindByID(s.UserID)
+	usr, err := u.userRepo.FindByID(ctx, s.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +104,8 @@ func (u *usecase) CreateSighting(sighting *model.Sighting) (*model.Sighting, err
 }
 
 // GetSightingsByTigerID implements entities.SightingUsecase.
-func (u *usecase) GetSightingsByTigerID(tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
-	sightings, err := u.repo.FindByTigerID(tigerID, page, pageSize)
+func (u *usecase) GetSightingsByTigerID(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
+	sightings, err := u.repo.FindByTigerID(ctx, tigerID, page, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +124,11 @@ func (u *usecase) GetSightingsByTigerID(tigerID uint, page int, pageSize int) ([
 	return result, nil
 }
 
-func NewSightingUsecase(repo entities.SightingRepository, tigerRepo entities.TigerRepository, userRepo entities.UserRepository) entities.SightingUsecase {
-	return &usecase{repo, tigerRepo, userRepo}
+func NewSightingUsecase(
+	repo entities.SightingRepository,
+	tigerRepo entities.TigerRepository,
+	userRepo entities.UserRepository,
+	s3 *s3client.S3Client,
+) entities.SightingUsecase {
+	return &usecase{repo, tigerRepo, userRepo, s3}
 }

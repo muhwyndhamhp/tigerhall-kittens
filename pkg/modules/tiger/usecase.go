@@ -1,6 +1,8 @@
 package tiger
 
 import (
+	"context"
+
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
@@ -11,7 +13,7 @@ type usecase struct {
 }
 
 // CreateTiger implements entities.TigerUsecase.
-func (u *usecase) CreateTiger(tiger *model.Tiger, userID uint) (*model.Tiger, error) {
+func (u *usecase) CreateTiger(ctx context.Context, tiger *model.NewTiger, userID uint) (*model.Tiger, error) {
 	t := entities.Tiger{
 		Name:          tiger.Name,
 		DateOfBirth:   tiger.DateOfBirth,
@@ -20,7 +22,7 @@ func (u *usecase) CreateTiger(tiger *model.Tiger, userID uint) (*model.Tiger, er
 		LastLongitude: tiger.LastLongitude,
 	}
 
-	err := u.repo.Create(&t)
+	err := u.repo.Create(ctx, &t)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +35,7 @@ func (u *usecase) CreateTiger(tiger *model.Tiger, userID uint) (*model.Tiger, er
 		UserID:    userID,
 	}
 
-	err = u.sightingRepo.Create(&sighting)
+	err = u.sightingRepo.Create(ctx, &sighting)
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +59,8 @@ func (u *usecase) CreateTiger(tiger *model.Tiger, userID uint) (*model.Tiger, er
 }
 
 // GetTigerByID implements entities.TigerUsecase.
-func (u *usecase) GetTigerByID(id uint) (*model.Tiger, error) {
-	t, err := u.repo.FindByID(id)
+func (u *usecase) GetTigerByID(ctx context.Context, id uint) (*model.Tiger, error) {
+	t, err := u.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +77,8 @@ func (u *usecase) GetTigerByID(id uint) (*model.Tiger, error) {
 }
 
 // GetTigers implements entities.TigerUsecase.
-func (u *usecase) GetTigers(page int, pageSize int) ([]*model.Tiger, error) {
-	tigers, err := u.repo.FindAll(page, pageSize)
+func (u *usecase) GetTigers(ctx context.Context, page int, pageSize int) ([]*model.Tiger, error) {
+	tigers, err := u.repo.FindAll(ctx, page, pageSize)
 	if err != nil {
 		return nil, err
 	}

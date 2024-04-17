@@ -1,6 +1,8 @@
 package tiger
 
 import (
+	"context"
+
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes"
 	"gorm.io/gorm"
@@ -11,8 +13,8 @@ type repo struct {
 }
 
 // Create implements entities.TigerRepository.
-func (r *repo) Create(tiger *entities.Tiger) error {
-	err := r.db.Create(tiger).Error
+func (r *repo) Create(ctx context.Context, tiger *entities.Tiger) error {
+	err := r.db.WithContext(ctx).Create(tiger).Error
 	if err != nil {
 		return err
 	}
@@ -21,9 +23,10 @@ func (r *repo) Create(tiger *entities.Tiger) error {
 }
 
 // FindAll implements entities.TigerRepository.
-func (r *repo) FindAll(page, pageSize int) ([]entities.Tiger, error) {
+func (r *repo) FindAll(ctx context.Context, page, pageSize int) ([]entities.Tiger, error) {
 	var res []entities.Tiger
 	err := r.db.
+		WithContext(ctx).
 		Scopes(scopes.Paginate(page, pageSize)).
 		Order("last_seen DESC").
 		Find(&res).
@@ -36,9 +39,9 @@ func (r *repo) FindAll(page, pageSize int) ([]entities.Tiger, error) {
 }
 
 // FindByID implements entities.TigerRepository.
-func (r *repo) FindByID(id uint) (*entities.Tiger, error) {
+func (r *repo) FindByID(ctx context.Context, id uint) (*entities.Tiger, error) {
 	var res entities.Tiger
-	err := r.db.First(&res, id).Error
+	err := r.db.WithContext(ctx).First(&res, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -47,12 +50,12 @@ func (r *repo) FindByID(id uint) (*entities.Tiger, error) {
 }
 
 // Update implements entities.TigerRepository.
-func (r *repo) Update(tiger *entities.Tiger, id uint) error {
+func (r *repo) Update(ctx context.Context, tiger *entities.Tiger, id uint) error {
 	if tiger.ID == 0 {
 		tiger.ID = id
 	}
 
-	err := r.db.Save(tiger).Error
+	err := r.db.WithContext(ctx).Save(tiger).Error
 	if err != nil {
 		return err
 	}

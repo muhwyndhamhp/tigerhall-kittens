@@ -31,7 +31,7 @@ func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
 				return next(c)
 			}
 
-			u, err := repo.FindByID(tu.ID)
+			u, err := repo.FindByID(c.Request().Context(), tu.ID)
 			if err != nil || u == nil {
 				return next(c)
 			}

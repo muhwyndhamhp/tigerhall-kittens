@@ -18,13 +18,7 @@ func (r *mutationResolver) CreateTiger(ctx context.Context, input model.NewTiger
 		return nil, err
 	}
 
-	t, err := r.tigerUsecase.CreateTiger(&model.Tiger{
-		Name:          input.Name,
-		DateOfBirth:   input.DateOfBirth,
-		LastSeen:      input.LastSeen,
-		LastLatitude:  input.LastLatitude,
-		LastLongitude: input.LastLongitude,
-	}, u.ID)
+	t, err := r.tigerUsecase.CreateTiger(ctx, &input, u.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +33,7 @@ func (r *mutationResolver) CreateSighting(ctx context.Context, input model.NewSi
 		return nil, err
 	}
 
-	s, err := r.sightingUsecase.CreateSighting(&model.Sighting{
-		Date:      input.Date,
-		Latitude:  input.Latitude,
-		Longitude: input.Longitude,
-		TigerID:   input.TigerID,
-		UserID:    u.ID,
-	})
+	s, err := r.sightingUsecase.CreateSighting(ctx, &input, u.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +43,7 @@ func (r *mutationResolver) CreateSighting(ctx context.Context, input model.NewSi
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
-	token, err := r.userUsecase.CreateUser(input.Name, input.Email, input.Password)
+	token, err := r.userUsecase.CreateUser(ctx, &input)
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +53,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, email string, password string) (string, error) {
-	token, err := r.userUsecase.Login(email, password)
+	token, err := r.userUsecase.Login(ctx, email, password)
 	if err != nil {
 		return "", err
 	}
@@ -75,7 +63,7 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 
 // Tigers is the resolver for the tigers field.
 func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize int) ([]*model.Tiger, error) {
-	tigers, err := r.tigerUsecase.GetTigers(page, pageSize)
+	tigers, err := r.tigerUsecase.GetTigers(ctx, page, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +73,7 @@ func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize int) ([]*
 
 // SightingByTiger is the resolver for the sightingByTiger field.
 func (r *queryResolver) SightingByTiger(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
-	sightings, err := r.sightingUsecase.GetSightingsByTigerID(tigerID, page, pageSize)
+	sightings, err := r.sightingUsecase.GetSightingsByTigerID(ctx, tigerID, page, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +87,7 @@ func (r *sightingResolver) Tiger(ctx context.Context, obj *model.Sighting) (*mod
 		return nil, nil
 	}
 
-	t, err := r.tigerUsecase.GetTigerByID(obj.TigerID)
+	t, err := r.tigerUsecase.GetTigerByID(ctx, obj.TigerID)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +101,7 @@ func (r *sightingResolver) User(ctx context.Context, obj *model.Sighting) (*mode
 		return nil, nil
 	}
 
-	u, err := r.userUsecase.GetUserByID(obj.UserID)
+	u, err := r.userUsecase.GetUserByID(ctx, obj.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +115,7 @@ func (r *tigerResolver) Sightings(ctx context.Context, obj *model.Tiger) ([]*mod
 		return nil, nil
 	}
 
-	sightings, err := r.sightingUsecase.GetSightingsByTigerID(obj.ID, 0, 0)
+	sightings, err := r.sightingUsecase.GetSightingsByTigerID(ctx, obj.ID, 0, 0)
 	if err != nil {
 		return nil, err
 	}

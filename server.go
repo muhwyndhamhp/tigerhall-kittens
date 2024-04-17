@@ -12,6 +12,7 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tiger"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client"
 )
 
 const defaultPort = "8080"
@@ -26,13 +27,15 @@ func main() {
 
 	d := db.GetDB()
 
+	s3 := s3client.NewS3Client()
+
 	userRepo := user.NewUserRepository(d)
 	tigerRepo := tiger.NewTigerRepository(d)
 	sightingRepo := sighting.NewSightingRepository(d)
 
 	userUsecase := user.NewUserUsecase(userRepo)
 	tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo)
-	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo)
+	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3)
 
 	resolver := graph.NewResolver(userUsecase, tigerUsecase, sightingUsecase)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))

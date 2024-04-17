@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
@@ -10,8 +12,8 @@ type usecase struct {
 }
 
 // GetUserByID implements entities.UserUsecase.
-func (u *usecase) GetUserByID(id uint) (*model.User, error) {
-	usr, err := u.repo.FindByID(id)
+func (u *usecase) GetUserByID(ctx context.Context, id uint) (*model.User, error) {
+	usr, err := u.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -24,23 +26,23 @@ func (u *usecase) GetUserByID(id uint) (*model.User, error) {
 }
 
 // CreateUser implements entities.UserUsecase.
-func (u *usecase) CreateUser(name, email, password string) (string, error) {
-	h, err := entities.HashPassword(password)
+func (u *usecase) CreateUser(ctx context.Context, usr *model.NewUser) (string, error) {
+	h, err := entities.HashPassword(usr.Password)
 	if err != nil {
 		return "", err
 	}
 
-	usr := entities.User{
-		Name:         name,
-		Email:        email,
+	newUsr := entities.User{
+		Name:         usr.Name,
+		Email:        usr.Email,
 		PasswordHash: h,
 	}
-	err = u.repo.Create(&usr)
+	err = u.repo.Create(ctx, &newUsr)
 	if err != nil {
 		return "", err
 	}
 
-	token, err := usr.GenerateToken()
+	token, err := newUsr.GenerateToken()
 	if err != nil {
 		return "", err
 	}
@@ -49,8 +51,8 @@ func (u *usecase) CreateUser(name, email, password string) (string, error) {
 }
 
 // Login implements entities.UserUsecase.
-func (u *usecase) Login(email string, password string) (string, error) {
-	usr, err := u.repo.FindByEmail(email)
+func (u *usecase) Login(ctx context.Context, email string, password string) (string, error) {
+	usr, err := u.repo.FindByEmail(ctx, email)
 	if err != nil {
 		return "", err
 	}

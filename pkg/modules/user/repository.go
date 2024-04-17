@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"gorm.io/gorm"
 )
@@ -10,9 +12,9 @@ type repo struct {
 }
 
 // FindByID implements entities.UserRepository.
-func (r *repo) FindByID(id uint) (*entities.User, error) {
+func (r *repo) FindByID(ctx context.Context, id uint) (*entities.User, error) {
 	var res entities.User
-	err := r.db.Where("id = ?", id).First(&res).Error
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&res).Error
 	if err != nil {
 		return nil, err
 	}
@@ -21,8 +23,8 @@ func (r *repo) FindByID(id uint) (*entities.User, error) {
 }
 
 // Create implements entities.UserRepository.
-func (r *repo) Create(user *entities.User) error {
-	err := r.db.Create(user).Error
+func (r *repo) Create(ctx context.Context, user *entities.User) error {
+	err := r.db.WithContext(ctx).Create(user).Error
 	if err != nil {
 		return err
 	}
@@ -31,9 +33,9 @@ func (r *repo) Create(user *entities.User) error {
 }
 
 // FindByEmail implements entities.UserRepository.
-func (r *repo) FindByEmail(email string) (*entities.User, error) {
+func (r *repo) FindByEmail(ctx context.Context, email string) (*entities.User, error) {
 	var res entities.User
-	err := r.db.Where("email = ?", email).First(&res).Error
+	err := r.db.WithContext(ctx).Where("email = ?", email).First(&res).Error
 	if err != nil {
 		return nil, err
 	}
