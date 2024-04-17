@@ -21,12 +21,20 @@ func (r *repo) Create(ctx context.Context, sighting *entities.Sighting) error {
 	return nil
 }
 
-func (r *repo) FindByTigerID(ctx context.Context, tigerID uint, page, pageSize int) ([]entities.Sighting, error) {
+func (r *repo) FindByTigerID(ctx context.Context, tigerID uint, preloads []scopes.Preload, page, pageSize int) ([]entities.Sighting, error) {
 	var res []entities.Sighting
-	err := r.db.WithContext(ctx).
+
+	q := r.db.
+		WithContext(ctx).
 		Scopes(scopes.Paginate(page, pageSize)).
 		Where("tiger_id = ?", tigerID).
-		Order("date DESC").
+		Order("date DESC")
+
+	if len(preloads) > 0 {
+		q = q.Scopes(scopes.Preloads(preloads...))
+	}
+
+	err := q.
 		Find(&res).
 		Error
 	if err != nil {

@@ -2,6 +2,7 @@ package email
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -34,6 +35,28 @@ func (c *EmailClient) SendSightingEmail(s *SightingEmail) error {
 	from := mail.NewEmail("Tigerhall Kittens", c.senderEmail)
 	subject := fmt.Sprintf("New Sightings for %s the Tiger!", s.TigerName)
 	to := mail.NewEmail("Example User", s.DestinationEmail)
+
+	html, err := c.RenderHTMLStr(s)
+	if err != nil {
+		return err
+	}
+
+	plain := c.RenderPlainStr(s)
+
+	message := mail.NewSingleEmail(from, subject, to, plain, html)
+
+	res, err := c.sg.Send(message)
+	if err != nil {
+		return err
+	}
+
+	js, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println(string(js))
+
+	return nil
+}
+
+func (c *EmailClient) RenderPlainStr(s *SightingEmail) string {
 	plain := fmt.Sprintf(`
 	  New Sighting for %s the Tiger Confirmed!
 	  Tiger Name: %s
@@ -48,48 +71,31 @@ func (c *EmailClient) SendSightingEmail(s *SightingEmail) error {
 		s.SightingLatitude,
 		s.SightingLongitude,
 	)
+	return plain
+}
 
+func (c *EmailClient) RenderHTMLStr(s *SightingEmail) (string, error) {
 	t, err := template.ParseFiles("utils/email/sighting.html")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var o bytes.Buffer
 	err = t.ExecuteTemplate(&o, "sighting", s)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	html := o.String()
 
-	fmt.Println(html)
-
-	message := mail.NewSingleEmail(from, subject, to, plain, html)
-
-	res, err := c.sg.Send(message)
-	if err != nil {
-		return err
-	}
-
-	log.Println(res.StatusCode)
-	log.Println(res.Body)
-	log.Println(res.Headers)
-	return nil
+	return html, nil
 }
 
-func (c *EmailClient) TestEmail() {
-	from := mail.NewEmail("Example User", "tigerhall-kittens@mwyndham.dev")
-	subject := "Sending with SendGrid is Fun"
-	to := mail.NewEmail("Example User", "kazeam.plus@gmail.com")
-	plainTextContent := "and easy to do anywhere, even with Go"
-	htmlContent := "<strong>and easy to do anywhere, even with Go</strong>"
-	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
-	res, err := c.sg.Send(message)
-	if err != nil {
-		log.Println(err)
-	} else {
-		fmt.Println(res.StatusCode)
-		fmt.Println(res.Body)
-		fmt.Println(res.Headers)
+func (c *EmailClient) QueueConsumer(msg <-chan SightingEmail) {
+	for m := range msg {
+		err := c.SendSightingEmail(&m)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }

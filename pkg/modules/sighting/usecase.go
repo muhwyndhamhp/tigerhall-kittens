@@ -3,7 +3,6 @@ package sighting
 import (
 	"context"
 	"fmt"
-	"log"
 
 	geo "github.com/kellydunn/golang-geo"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
@@ -11,6 +10,7 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/imageproc"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes"
 )
 
 type usecase struct {
@@ -18,12 +18,12 @@ type usecase struct {
 	tigerRepo entities.TigerRepository
 	userRepo  entities.UserRepository
 	s3        *s3client.S3Client
-	em        *email.EmailClient
+	ch        chan<- email.SightingEmail
 }
 
 // CreateSighting implements entities.SightingUsecase.
 func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSighting, userID uint) (*model.Sighting, error) {
-	ls, err := u.repo.FindByTigerID(ctx, sighting.TigerID, 1, 1)
+	ls, err := u.repo.FindByTigerID(ctx, sighting.TigerID, []scopes.Preload{}, 1, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -85,20 +85,7 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 		return nil, err
 	}
 
-	go func() {
-		fmt.Println("Sending email")
-		err := u.em.SendSightingEmail(&email.SightingEmail{
-			DestinationEmail:  "kazeam.plus@gmail.com",
-			TigerName:         t.Name,
-			SightingDate:      s.Date.Format("2006-01-02 15:04:05"),
-			SightingLatitude:  fmt.Sprintf("%f", s.Latitude),
-			SightingLongitude: fmt.Sprintf("%f", s.Longitude),
-			ImageURL:          s.ImageURL,
-		})
-		if err != nil {
-			log.Println(err)
-		}
-	}()
+	go u.queueEmail(t)
 
 	return &model.Sighting{
 		ID:        s.ID,
@@ -123,9 +110,45 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 	}, nil
 }
 
+func (u *usecase) queueEmail(t *entities.Tiger) {
+	fmt.Println("Sending email to other users...")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	sh, err := u.repo.FindByTigerID(ctx, t.ID, []scopes.Preload{
+		{
+			Key:       "User",
+			Statement: "",
+		},
+	}, 1, 1000)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	sentUsr := map[string]bool{}
+	for _, s := range sh {
+		if _, ok := sentUsr[s.User.Email]; ok {
+			continue
+		}
+
+		m := email.SightingEmail{
+			DestinationEmail:  s.User.Email,
+			TigerName:         t.Name,
+			SightingDate:      s.Date.Format("2006-01-02 15:04:05"),
+			SightingLatitude:  fmt.Sprintf("%f", s.Latitude),
+			SightingLongitude: fmt.Sprintf("%f", s.Longitude),
+			ImageURL:          s.ImageURL,
+		}
+		u.ch <- m
+
+		sentUsr[s.User.Email] = true
+	}
+}
+
 // GetSightingsByTigerID implements entities.SightingUsecase.
 func (u *usecase) GetSightingsByTigerID(ctx context.Context, tigerID uint, page int, pageSize int) ([]*model.Sighting, error) {
-	sightings, err := u.repo.FindByTigerID(ctx, tigerID, page, pageSize)
+	sightings, err := u.repo.FindByTigerID(ctx, tigerID, []scopes.Preload{}, page, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +174,7 @@ func NewSightingUsecase(
 	userRepo entities.UserRepository,
 	s3 *s3client.S3Client,
 	em *email.EmailClient,
+	ch chan<- email.SightingEmail,
 ) entities.SightingUsecase {
-	return &usecase{repo, tigerRepo, userRepo, s3, em}
+	return &usecase{repo, tigerRepo, userRepo, s3, ch}
 }

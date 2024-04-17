@@ -30,13 +30,15 @@ func main() {
 	em := email.NewEmailClient()
 	s3 := s3client.NewS3Client()
 
+	queue := make(chan email.SightingEmail)
+
 	userRepo := user.NewUserRepository(d)
 	tigerRepo := tiger.NewTigerRepository(d)
 	sightingRepo := sighting.NewSightingRepository(d)
 
 	userUsecase := user.NewUserUsecase(userRepo)
 	tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo)
-	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3, em)
+	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3, em, queue)
 
 	resolver := graph.NewResolver(userUsecase, tigerUsecase, sightingUsecase)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
@@ -45,6 +47,8 @@ func main() {
 	e.GET("/", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))
 	e.File("/altair.html", "public/altair.html")
+
+	go em.QueueConsumer(queue)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Printf("Or connect to http://localhost:%s/altair.html for Altair", port)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,7 @@ type Sighting struct {
 	Longitude float64   `json:"longitude"`
 	TigerID   uint      `json:"tiger_id"`
 	UserID    uint      `json:"user_id"`
+	User      *User     `gorm:"foreignKey:UserID"`
 	ImageURL  string    `json:"image_url"`
 }
 
@@ -31,5 +33,5 @@ type SightingUsecase interface {
 
 type SightingRepository interface {
 	Create(ctx context.Context, sighting *Sighting) error
-	FindByTigerID(ctx context.Context, tigerID uint, page, pageSize int) ([]Sighting, error)
+	FindByTigerID(ctx context.Context, tigerID uint, preloads []scopes.Preload, page, pageSize int) ([]Sighting, error)
 }
