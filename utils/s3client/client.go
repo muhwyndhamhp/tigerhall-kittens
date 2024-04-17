@@ -21,7 +21,11 @@ type S3Client struct {
 
 const defaultBucketName = "tigerhall-kittens"
 
-func NewS3Client() *S3Client {
+type S3ClientInterface interface {
+	UploadImage(ctx context.Context, r *bytes.Reader, filename, contentType string, size int64) (string, error)
+}
+
+func NewS3Client() S3ClientInterface {
 	accountId := conf.Get(conf.CF_ACCOUNT_ID)
 	accessKeyId := conf.Get(conf.CF_R2_ACCESS_KEY_ID)
 	accessKeySecret := conf.Get(conf.CF_R2_SECRET_ACCESS_KEY)
