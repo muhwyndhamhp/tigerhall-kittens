@@ -88,6 +88,7 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 		Longitude: s.Longitude,
 		TigerID:   s.TigerID,
 		UserID:    s.UserID,
+		ImageURL:  &s.ImageURL,
 		Tiger: &model.Tiger{
 			ID:            t.ID,
 			Name:          t.Name,
@@ -119,6 +120,7 @@ func (u *usecase) GetSightingsByTigerID(ctx context.Context, tigerID uint, page 
 			Longitude: s.Longitude,
 			TigerID:   s.TigerID,
 			UserID:    s.UserID,
+			ImageURL:  &s.ImageURL,
 		})
 	}
 	return result, nil

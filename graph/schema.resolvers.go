@@ -135,9 +135,7 @@ func (r *Resolver) Sighting() SightingResolver { return &sightingResolver{r} }
 // Tiger returns TigerResolver implementation.
 func (r *Resolver) Tiger() TigerResolver { return &tigerResolver{r} }
 
-type (
-	mutationResolver struct{ *Resolver }
-	queryResolver    struct{ *Resolver }
-	sightingResolver struct{ *Resolver }
-	tigerResolver    struct{ *Resolver }
-)
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+type sightingResolver struct{ *Resolver }
+type tigerResolver struct{ *Resolver }

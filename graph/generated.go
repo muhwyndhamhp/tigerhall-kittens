@@ -65,6 +65,7 @@ type ComplexityRoot struct {
 	Sighting struct {
 		Date      func(childComplexity int) int
 		ID        func(childComplexity int) int
+		ImageURL  func(childComplexity int) int
 		Latitude  func(childComplexity int) int
 		Longitude func(childComplexity int) int
 		Tiger     func(childComplexity int) int
@@ -213,6 +214,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Sighting.ID(childComplexity), true
+
+	case "Sighting.imageURL":
+		if e.complexity.Sighting.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.Sighting.ImageURL(childComplexity), true
 
 	case "Sighting.latitude":
 		if e.complexity.Sighting.Latitude == nil {
@@ -758,6 +766,8 @@ func (ec *executionContext) fieldContext_Mutation_createSighting(ctx context.Con
 				return ec.fieldContext_Sighting_userID(ctx, field)
 			case "user":
 				return ec.fieldContext_Sighting_user(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Sighting_imageURL(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Sighting", field.Name)
 		},
@@ -1012,6 +1022,8 @@ func (ec *executionContext) fieldContext_Query_sightingByTiger(ctx context.Conte
 				return ec.fieldContext_Sighting_userID(ctx, field)
 			case "user":
 				return ec.fieldContext_Sighting_user(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Sighting_imageURL(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Sighting", field.Name)
 		},
@@ -1535,6 +1547,47 @@ func (ec *executionContext) fieldContext_Sighting_user(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Sighting_imageURL(ctx context.Context, field graphql.CollectedField, obj *model.Sighting) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Sighting_imageURL(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Sighting_imageURL(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Sighting",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Tiger_id(ctx context.Context, field graphql.CollectedField, obj *model.Tiger) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Tiger_id(ctx, field)
 	if err != nil {
@@ -1854,6 +1907,8 @@ func (ec *executionContext) fieldContext_Tiger_sightings(ctx context.Context, fi
 				return ec.fieldContext_Sighting_userID(ctx, field)
 			case "user":
 				return ec.fieldContext_Sighting_user(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Sighting_imageURL(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Sighting", field.Name)
 		},
@@ -4202,6 +4257,8 @@ func (ec *executionContext) _Sighting(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "imageURL":
+			out.Values[i] = ec._Sighting_imageURL(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

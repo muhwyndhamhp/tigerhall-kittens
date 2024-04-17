@@ -24,6 +24,7 @@ type Sighting {
     tiger: Tiger!
     userID: ID!
     user: User!
+    imageURL: String
 }
 
 type User {

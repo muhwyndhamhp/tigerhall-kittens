@@ -45,6 +45,7 @@ type Sighting struct {
 	Tiger     *Tiger    `json:"tiger"`
 	UserID    uint      `json:"userID"`
 	User      *User     `json:"user"`
+	ImageURL  *string   `json:"imageURL,omitempty"`
 }
 
 type Tiger struct {
