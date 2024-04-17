@@ -11,6 +11,26 @@ type usecase struct {
 	repo entities.UserRepository
 }
 
+// RefreshToken implements entities.UserUsecase.
+func (u *usecase) RefreshToken(ctx context.Context, token string) (string, error) {
+	tu, err := entities.ParseToken(token)
+	if err != nil {
+		return "", err
+	}
+
+	usr, err := u.repo.FindByID(ctx, tu.ID)
+	if err != nil {
+		return "", err
+	}
+
+	newToken, err := usr.GenerateToken()
+	if err != nil {
+		return "", err
+	}
+
+	return newToken, nil
+}
+
 // GetUserByID implements entities.UserUsecase.
 func (u *usecase) GetUserByID(ctx context.Context, id uint) (*model.User, error) {
 	usr, err := u.repo.FindByID(ctx, id)

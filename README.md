@@ -22,7 +22,7 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
 - [ ] Create Unit Test for Each Function
   - [x] Create Unit Test for Sighting
   - [ ] Create Unit Test for User
-  - [ ] Create Unit Test for Tiger
+  - [x] Create Unit Test for Tiger
   - [ ] Create Unit Test for Utils Email
   - [ ] Create Unit Test for Utils S3
 - [ ] Create Integration Test for Each Endpoint

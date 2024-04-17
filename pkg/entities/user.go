@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -23,6 +24,7 @@ type User struct {
 type UserUsecase interface {
 	CreateUser(ctx context.Context, usr *model.NewUser) (string, error)
 	Login(ctx context.Context, email, password string) (string, error)
+	RefreshToken(ctx context.Context, token string) (string, error)
 	GetUserByID(ctx context.Context, id uint) (*model.User, error)
 }
 
@@ -60,7 +62,12 @@ func (u *User) GenerateToken() (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 
-	exp, err := strconv.Atoi(config.Get(config.JWT_EXPIRY_DURATION))
+	expStr := config.Get(config.JWT_EXPIRY_DURATION)
+	if expStr == "" {
+		expStr = "86400" // 24 hours
+	}
+
+	exp, err := strconv.Atoi(expStr)
 	if err != nil {
 		return "", err
 	}
@@ -68,7 +75,7 @@ func (u *User) GenerateToken() (string, error) {
 	claims["id"] = u.ID
 	claims["username"] = u.Name
 	claims["email"] = u.Email
-	claims["exp"] = time.Now().Add(time.Second * time.Duration(exp)).Unix()
+	claims["exp"] = timex.Now().Add(time.Second * time.Duration(exp)).Unix()
 	ts, err := token.SignedString(secretKey)
 	if err != nil {
 		return "", err
@@ -95,13 +102,4 @@ func ParseToken(tokenString string) (*User, error) {
 	} else {
 		return nil, err
 	}
-}
-
-func RefreshToken(tokenString string) (string, error) {
-	u, err := ParseToken(tokenString)
-	if err != nil {
-		return "", err
-	}
-
-	return u.GenerateToken()
 }

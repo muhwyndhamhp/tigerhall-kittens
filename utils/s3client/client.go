@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	conf "github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
 )
 
 type S3Client struct {
@@ -71,6 +71,6 @@ func (c *S3Client) UploadImage(ctx context.Context, r *bytes.Reader, filename, c
 func AppendTimestamp(fileName string) string {
 	extension := filepath.Ext(fileName)
 	name := fileName[0 : len(fileName)-len(extension)]
-	fileName = fmt.Sprintf("%s-%s%s", name, time.Now().Format("20060102150405"), extension)
+	fileName = fmt.Sprintf("%s-%s%s", name, timex.Now().Format("20060102150405"), extension)
 	return fileName
 }
