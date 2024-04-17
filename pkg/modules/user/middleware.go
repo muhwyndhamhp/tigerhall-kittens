@@ -17,22 +17,8 @@ func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
-
-			if authHeader == "" {
-				return next(c)
-			}
-
-			tu, err := entities.ParseToken(authHeader)
+			u, err := ExtractUserFromJWT(c.Request().Context(), repo, authHeader)
 			if err != nil {
-				return next(c)
-			}
-
-			if tu == nil {
-				return next(c)
-			}
-
-			u, err := repo.FindByID(c.Request().Context(), tu.ID)
-			if err != nil || u == nil {
 				return next(c)
 			}
 
@@ -41,6 +27,28 @@ func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
 			return next(c)
 		}
 	}
+}
+
+func ExtractUserFromJWT(ctx context.Context, repo entities.UserRepository, authHeader string) (*entities.User, error) {
+	if authHeader == "" {
+		return nil, entities.ErrUserByCtxNotFound
+	}
+
+	tu, err := entities.ParseToken(authHeader)
+	if err != nil {
+		return nil, err
+	}
+
+	if tu == nil {
+		return nil, entities.ErrUserByCtxNotFound
+	}
+
+	u, err := repo.FindByID(ctx, tu.ID)
+	if err != nil || u == nil {
+		return nil, entities.ErrUserByCtxNotFound
+	}
+
+	return u, nil
 }
 
 func UserByCtx(ctx context.Context) (*entities.User, error) {
