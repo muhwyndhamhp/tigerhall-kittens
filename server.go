@@ -43,6 +43,7 @@ func main() {
 	e.Use(user.AuthMiddleware(userRepo))
 	e.GET("/", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))
+	e.File("/altair.html", "public/altair.html")
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(e.Start(":" + port))
