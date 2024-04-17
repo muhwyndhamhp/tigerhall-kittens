@@ -44,13 +44,13 @@ func main() {
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
 	e.Use(user.AuthMiddleware(userRepo))
-	e.GET("/", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
+	e.GET("/graphiql", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))
 	e.File("/altair.html", "public/altair.html")
 
 	go em.QueueConsumer(queue)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Printf("Or connect to http://localhost:%s/altair.html for Altair", port)
+	log.Printf("connect to http://localhost:%s/graphiql for GraphiQL playground", port)
+	log.Printf("or connect to http://localhost:%s/altair.html for Altair", port)
 	log.Fatal(e.Start(":" + port))
 }
