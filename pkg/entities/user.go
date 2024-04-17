@@ -34,7 +34,10 @@ type UserRepository interface {
 	FindByID(ctx context.Context, id uint) (*User, error)
 }
 
-var ErrUserByCtxNotFound = errors.New("ErrUserByCtxNotFound: user not found in context")
+var (
+	ErrUserByCtxNotFound = errors.New("ErrUserByCtxNotFound: user not found in context")
+	ErrUserAlreadyExists = errors.New("ErrUserAlreadyExists: user already exists")
+)
 
 // Password Hashing Implementation
 func HashPassword(password string) (string, error) {

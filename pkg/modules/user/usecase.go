@@ -52,6 +52,11 @@ func (u *usecase) CreateUser(ctx context.Context, usr *model.NewUser) (string, e
 		return "", err
 	}
 
+	existingUser, _ := u.repo.FindByEmail(ctx, usr.Email)
+	if existingUser != nil {
+		return "", entities.ErrUserAlreadyExists
+	}
+
 	newUsr := entities.User{
 		Name:         usr.Name,
 		Email:        usr.Email,

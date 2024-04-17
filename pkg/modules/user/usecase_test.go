@@ -21,6 +21,9 @@ func TestUsecase_CreateUser(t *testing.T) {
 
 		usr *model.NewUser
 
+		findByEmailResp *entities.User
+		findByEmailErr  error
+
 		createErr error
 		want      string
 		wantErr   error
@@ -32,9 +35,10 @@ func TestUsecase_CreateUser(t *testing.T) {
 				Email:    "mail-1@example.com",
 				Password: "inipasswordnya!",
 			},
-			createErr: nil,
-			want:      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Hjcf56Yd3_JDtEI9Ov1VAq-ujwK4s3CIaXiSNWHkPME",
-			wantErr:   nil,
+			findByEmailErr: gorm.ErrRecordNotFound,
+			createErr:      nil,
+			want:           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Hjcf56Yd3_JDtEI9Ov1VAq-ujwK4s3CIaXiSNWHkPME",
+			wantErr:        nil,
 		},
 	}
 
@@ -45,10 +49,16 @@ func TestUsecase_CreateUser(t *testing.T) {
 			uc := NewUserUsecase(repo)
 
 			timex.SetTestTime(now)
+
+			repo.
+				On("FindByEmail", mock.Anything, tc.usr.Email).
+				Return(tc.findByEmailResp, tc.findByEmailErr).
+				Once()
+
 			repo.
 				On("Create", mock.Anything, mock.Anything).
 				Return(tc.createErr).
-				Once()
+				Maybe()
 
 			token, err := uc.CreateUser(context.Background(), tc.usr)
 
