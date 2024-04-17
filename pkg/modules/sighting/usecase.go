@@ -17,23 +17,21 @@ type usecase struct {
 	repo      entities.SightingRepository
 	tigerRepo entities.TigerRepository
 	userRepo  entities.UserRepository
-	s3        *s3client.S3Client
+	s3        s3client.S3ClientInterface
 	ch        chan<- email.SightingEmail
 }
 
 // CreateSighting implements entities.SightingUsecase.
 func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSighting, userID uint) (*model.Sighting, error) {
-	ls, _, err := u.repo.FindByTigerID(ctx, sighting.TigerID, []scopes.Preload{}, 1, 1)
+	t, err := u.tigerRepo.FindByID(ctx, sighting.TigerID)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(ls) > 0 {
-		p0 := geo.NewPoint(ls[0].Latitude, ls[0].Longitude)
-		p1 := geo.NewPoint(sighting.Latitude, sighting.Longitude)
-		if p1.GreatCircleDistance(p0) <= 5.0 {
-			return nil, entities.ErrTigerTooClose
-		}
+	p0 := geo.NewPoint(t.LastLatitude, t.LastLongitude)
+	p1 := geo.NewPoint(sighting.Latitude, sighting.Longitude)
+	if p1.GreatCircleDistance(p0) <= 5.0 {
+		return nil, entities.ErrTigerTooClose
 	}
 
 	s := entities.Sighting{
@@ -66,11 +64,6 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 		return nil, err
 	}
 
-	t, err := u.tigerRepo.FindByID(ctx, s.TigerID)
-	if err != nil {
-		return nil, err
-	}
-
 	t.LastSeen = s.Date
 	t.LastLatitude = s.Latitude
 	t.LastLongitude = s.Longitude
@@ -80,34 +73,22 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 		return nil, err
 	}
 
-	usr, err := u.userRepo.FindByID(ctx, s.UserID)
-	if err != nil {
-		return nil, err
-	}
-
 	go u.queueEmail(t)
 
-	return &model.Sighting{
+	m := &model.Sighting{
 		ID:        s.ID,
 		Date:      s.Date,
 		Latitude:  s.Latitude,
 		Longitude: s.Longitude,
 		TigerID:   s.TigerID,
 		UserID:    s.UserID,
-		ImageURL:  &s.ImageURL,
-		Tiger: &model.Tiger{
-			ID:            t.ID,
-			Name:          t.Name,
-			LastSeen:      t.LastSeen,
-			LastLatitude:  t.LastLatitude,
-			LastLongitude: t.LastLongitude,
-		},
-		User: &model.User{
-			ID:    usr.ID,
-			Name:  usr.Name,
-			Email: usr.Email,
-		},
-	}, nil
+	}
+
+	if s.ImageURL != "" {
+		m.ImageURL = &s.ImageURL
+	}
+
+	return m, nil
 }
 
 func (u *usecase) queueEmail(t *entities.Tiger) {
@@ -172,7 +153,7 @@ func NewSightingUsecase(
 	repo entities.SightingRepository,
 	tigerRepo entities.TigerRepository,
 	userRepo entities.UserRepository,
-	s3 *s3client.S3Client,
+	s3 s3client.S3ClientInterface,
 	ch chan<- email.SightingEmail,
 ) entities.SightingUsecase {
 	return &usecase{repo, tigerRepo, userRepo, s3, ch}
