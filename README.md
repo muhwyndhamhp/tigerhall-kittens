@@ -9,18 +9,6 @@ It has 2 built-in options for GraphQL Editor / Playground:
 - [Altair (Recommended)](https://tigerhall-kittens.fly.dev/altair)
 - [GraphiQL](https://tigerhall-kittens.fly.dev/graphiql)
 
-## Infrastructure Overview
-![Infra Overview](schema.png)
-The infrastructure follows the *"Progressive Enhancement"* concept, which means the system will be able to self-sustain, but will become increasingly more capable as more feature available to itself. 
-
-One of such example is the core of the system is the GraphQL Server, which is responsible for handling the business logic and data access. 
-
-The GraphQL Server is connected to a **Turso Database**, wich uses **LibSQL** (SQLite fork with enhancement in distributed replica) as the core driver, but to run the app it does not requires Turso DB connection as it able to run locally, whilst the Turso DB is used for the production environment.
-
-The GraphQL Server also has a Message Queue, which is used to send email notifications. The Message Queue is connected to the Email Service via SendGrid. The Email Service is responsible for sending the email notifications whenever new sightings are created. 
-
-The Following is the example of the email sent by the system when a new sighting is created:
-![Email Example](email-sample.png)
 ## Local Setup
 ***(If You're from Tigerhall, Please Use `.env` file provided in the email I sent!!)***
 
@@ -57,6 +45,35 @@ make run
 | `JWT_SECRET ` | Secret for JWT | `MuhWyndham-TigerHall-Kittens-Test` | Yes |
 | `SENDGRID_API_KEY` | SendGrid API Key | - | Yes |
 | `SENDGRID_SENDER_EMAIL` | SendGrid Email Origin | - | Yes |
+
+## Infrastructure Overview
+![Infra Overview](schema.png)
+The infrastructure follows the *"Progressive Enhancement"* concept, which means the system will be able to self-sustain, but will become increasingly more capable as more feature available to itself. 
+
+One of such example is the core of the system is the GraphQL Server, which is responsible for handling the business logic and data access. 
+
+The GraphQL Server is connected to a **Turso Database**, wich uses **LibSQL** (SQLite fork with enhancement in distributed replica) as the core driver, but to run the app it does not requires Turso DB connection as it able to run locally, whilst the Turso DB is used for the production environment.
+
+The GraphQL Server also has a Message Queue, which is used to send email notifications. The Message Queue is connected to the Email Service via SendGrid. The Email Service is responsible for sending the email notifications whenever new sightings are created. 
+
+The Following is the example of the email sent by the system when a new sighting is created:
+![Email Example](email-sample.png)
+
+## List of Technologies Used
+This project uses several techs so it can be more robust and production-ready. The following is the list of technologies used:
+- [Golang](https://golang.org/) : The main language used for the project
+- [GqlGen](https://gqlgen.com/) : The library used for generating the GraphQL Schema
+- [Gorm](https://gorm.io/) : The ORM used for the project
+- [Labstack Echo](https://echo.labstack.com/) : The web server used for the project
+- [Turso DB (LibSQL)](https://turso.tech/) : The database used for the project
+- [SendGrid](https://sendgrid.com/) : The email service used for sending email notifications
+- [Fly.io](https://fly.io/) : The platform used for deploying the project
+- [Docker](https://www.docker.com/) : The containerization used for the project
+- [Make](https://www.gnu.org/software/make/) : The automation tool used for the project
+- [Mockery](https://github.com/vektra/mockery) : The mocking tool used for the project
+- [Air](https://github.com/cosmtrek/air) : The hot reload tool used for the project
+- [Altair](https://altairgraphql.dev/) : The GraphQL Editor used for the project
+- [GraphiQL](https://github.com/graphql/graphiql) : The Alternative GraphQL Editor used for the project
 
 ## All Available Commands
 - `make auto-migrate` : Run the automigrate to create the tables
