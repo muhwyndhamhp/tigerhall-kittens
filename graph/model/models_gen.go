@@ -8,68 +8,114 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+// Mutation type for the GraphQL schema. It contains mutations that modify the data.
 type Mutation struct {
 }
 
+// Input type for creating a new sighting for a tiger.
 type NewSighting struct {
-	TigerID   uint            `json:"tigerID"`
-	Date      time.Time       `json:"date"`
-	Latitude  float64         `json:"latitude"`
-	Longitude float64         `json:"longitude"`
-	Image     *graphql.Upload `json:"image,omitempty"`
+	// This is the unique identifier of the tiger associated with the sighting. It is a required field.
+	TigerID uint `json:"tigerID"`
+	// This is the date of the sighting in RFC3339Nano format. It is a required field.
+	Date time.Time `json:"date"`
+	// This is the latitude of the sighting. It is a required field.
+	Latitude float64 `json:"latitude"`
+	// This is the longitude of the sighting. It is a required field.
+	Longitude float64 `json:"longitude"`
+	// This is the Multi-Part scalar for uploading image of the sighting. It is an optional field.
+	Image *graphql.Upload `json:"image,omitempty"`
 }
 
+// Input type for creating a new tiger profile.
 type NewTiger struct {
-	Name          string    `json:"name"`
-	DateOfBirth   time.Time `json:"dateOfBirth"`
-	LastSeen      time.Time `json:"lastSeen"`
-	LastLatitude  float64   `json:"lastLatitude"`
-	LastLongitude float64   `json:"lastLongitude"`
+	// This is the name of the tiger. It is a required field.
+	Name string `json:"name"`
+	// This is the date of birth of the tiger in RFC3339Nano format. It is a required field.
+	DateOfBirth time.Time `json:"dateOfBirth"`
+	// This is the last seen date of the tiger in RFC3339Nano format. This should indicate when the tiger was last seen when the tiger profile is created. It will be updated every time a new sighting is added for the tiger.
+	LastSeen time.Time `json:"lastSeen"`
+	// This is the last seen latitude of the tiger. This should indicate the last known location of the tiger when the tiger profile is created. It will be updated every time a new sighting is added for the tiger.
+	LastLatitude float64 `json:"lastLatitude"`
+	// This is the last seen longitude of the tiger. This should indicate the last known location of the tiger when the tiger profile is created. It will be updated every time a new sighting is added for the tiger.
+	LastLongitude float64 `json:"lastLongitude"`
 }
 
+// Input type for creating a new user profile.
 type NewUser struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
+	// This is the username of the user. It should be a single word without spaces. It is a required field.
+	Name string `json:"name"`
+	// This is the email of the user. It should be a valid email address and unique in the database. It is a required field.
+	Email string `json:"email"`
+	// This is the password of the user. It is a required field.
 	Password string `json:"password"`
 }
 
+// Query type for the GraphQL schema. It contains queries that does not modify the data.
 type Query struct {
 }
 
+// A type that describes a sighting of a tiger. It contains the date, latitude, and longitude of the sighting. It also contains the tigerID and userID of the tiger and user associated with the sighting.
 type Sighting struct {
-	ID        uint      `json:"id"`
-	Date      time.Time `json:"date"`
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
-	TigerID   uint      `json:"tigerID"`
-	Tiger     *Tiger    `json:"tiger"`
-	UserID    uint      `json:"userID"`
-	User      *User     `json:"user"`
-	ImageURL  *string   `json:"imageURL,omitempty"`
+	// This is the unique identifier for the sighting. It is an auto-incrementing integer.
+	ID uint `json:"id"`
+	// This is the date of the sighting in RFC3339Nano format.
+	Date time.Time `json:"date"`
+	// This is the latitude of the sighting.
+	Latitude float64 `json:"latitude"`
+	// This is the longitude of the sighting.
+	Longitude float64 `json:"longitude"`
+	// This is the unique identifier of the tiger associated with the sighting.
+	TigerID uint `json:"tigerID"`
+	// This is the tiger associated with the sighting.
+	Tiger *Tiger `json:"tiger"`
+	// This is the unique identifier of the user associated with the sighting.
+	UserID uint `json:"userID"`
+	// This is the user associated with the sighting.
+	User *User `json:"user"`
+	// This is the URL of the image uploaded for the sighting.
+	ImageURL *string `json:"imageURL,omitempty"`
 }
 
+// This is a pagination object for the Sighting type.
 type SightingsPagination struct {
+	// This is a list of sightings in the current page and sorted by the date property.
 	Sightings []*Sighting `json:"sightings"`
-	Total     int         `json:"total"`
+	// This is the total number of sightings for a given tiger. It can be used for pagination by dividing the total by the pageSize to get the total number of pages.
+	Total int `json:"total"`
 }
 
+// A type that describes a tiger. It contains the name, date of birth, last seen date, last seen latitude, and last seen longitude of the tiger. It also contains a list of sightings associated with the tiger.
 type Tiger struct {
-	ID            uint        `json:"id"`
-	Name          string      `json:"name"`
-	DateOfBirth   time.Time   `json:"dateOfBirth"`
-	LastSeen      time.Time   `json:"lastSeen"`
-	LastLatitude  float64     `json:"lastLatitude"`
-	LastLongitude float64     `json:"lastLongitude"`
-	Sightings     []*Sighting `json:"sightings"`
+	// This is the unique identifier for the tiger. It is an auto-incrementing integer.
+	ID uint `json:"id"`
+	// This is the name of the tiger. It is a required field.
+	Name string `json:"name"`
+	// This is the date of birth of the tiger in RFC3339Nano format.
+	DateOfBirth time.Time `json:"dateOfBirth"`
+	// This is the last seen date of the tiger in RFC3339Nano format. It is updated every time a new sighting is added for the tiger.
+	LastSeen time.Time `json:"lastSeen"`
+	// This is the last seen latitude of the tiger. It is updated every time a new sighting is added for the tiger.
+	LastLatitude float64 `json:"lastLatitude"`
+	// This is the last seen longitude of the tiger. It is updated every time a new sighting is added for the tiger.
+	LastLongitude float64 `json:"lastLongitude"`
+	// This is a list of sightings associated with the tiger. It is sorted by the date property of the sighting.
+	Sightings []*Sighting `json:"sightings"`
 }
 
+// This is a pagination object for the Tiger type.
 type TigerPagination struct {
+	// This is a list of tigers in the current page and sorted by the lastSeen property.
 	Tigers []*Tiger `json:"tigers"`
-	Total  int      `json:"total"`
+	// This is the total number of tigers in the database. It can be used for pagination by dividing the total by the pageSize to get the total number of pages.
+	Total int `json:"total"`
 }
 
+// User type that describes a user profile.
 type User struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
+	// This is the unique identifier for the user. It is an auto-incrementing integer.
+	ID uint `json:"id"`
+	// This is the username of the user. It should be a single word without spaces.
+	Name string `json:"name"`
+	// This is the email of the user. It should be a valid email address and unique in the database.
 	Email string `json:"email"`
 }

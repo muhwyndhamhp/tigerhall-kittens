@@ -2,78 +2,133 @@
 #
 # https://gqlgen.com/getting-started/
 
+"Scalar type that represents a date and time in the RFC3339Nano format."
 scalar Time
+"Scalar type that represents a file upload. It will handle Multi-Part form data."
 scalar Upload
 
+"A type that describes a tiger. It contains the name, date of birth, last seen date, last seen latitude, and last seen longitude of the tiger. It also contains a list of sightings associated with the tiger."
 type Tiger {
+    "This is the unique identifier for the tiger. It is an auto-incrementing integer."
     id: ID!
+    "This is the name of the tiger. It is a required field."
     name: String!
+    "This is the date of birth of the tiger in RFC3339Nano format."
     dateOfBirth: Time!
+    "This is the last seen date of the tiger in RFC3339Nano format. It is updated every time a new sighting is added for the tiger."
     lastSeen: Time!
+    "This is the last seen latitude of the tiger. It is updated every time a new sighting is added for the tiger."
     lastLatitude: Float!
+    "This is the last seen longitude of the tiger. It is updated every time a new sighting is added for the tiger."
     lastLongitude: Float!
+    "This is a list of sightings associated with the tiger. It is sorted by the date property of the sighting."
     sightings: [Sighting!]!
 }
 
+"A type that describes a sighting of a tiger. It contains the date, latitude, and longitude of the sighting. It also contains the tigerID and userID of the tiger and user associated with the sighting."
 type Sighting {
+    "This is the unique identifier for the sighting. It is an auto-incrementing integer."
     id: ID!
+    "This is the date of the sighting in RFC3339Nano format."
     date: Time!
+    "This is the latitude of the sighting."
     latitude: Float!
+    "This is the longitude of the sighting."
     longitude: Float!
+    "This is the unique identifier of the tiger associated with the sighting."
     tigerID: ID!
+    "This is the tiger associated with the sighting."
     tiger: Tiger!
+    "This is the unique identifier of the user associated with the sighting."
     userID: ID!
+    "This is the user associated with the sighting."
     user: User!
+    "This is the URL of the image uploaded for the sighting."
     imageURL: String
 }
 
+"User type that describes a user profile."
 type User {
+  "This is the unique identifier for the user. It is an auto-incrementing integer."
   id: ID!
+  "This is the username of the user. It should be a single word without spaces."
   name: String!
+  "This is the email of the user. It should be a valid email address and unique in the database."
   email: String!
 }
 
+"This is a pagination object for the Tiger type."
 type TigerPagination {
+  "This is a list of tigers in the current page and sorted by the lastSeen property."
   tigers: [Tiger!]!
+  "This is the total number of tigers in the database. It can be used for pagination by dividing the total by the pageSize to get the total number of pages."
   total: Int!
 }
 
+"This is a pagination object for the Sighting type."
 type SightingsPagination {
+  "This is a list of sightings in the current page and sorted by the date property."
   sightings: [Sighting!]!
+  "This is the total number of sightings for a given tiger. It can be used for pagination by dividing the total by the pageSize to get the total number of pages."
   total: Int!
 }
 
+"Query type for the GraphQL schema. It contains queries that does not modify the data."
 type Query {
+  "This is a query to get all the tigers in the database. It returns a pagination object with the list of tigers in the current page and the total number of tigers in the database. Parameters: page - the current page number, pageSize - the number of tigers per page."
   tigers(page: Int!, pageSize: Int!): TigerPagination!
+  "This is a query to get all the sightings for a given tiger. It returns a pagination object with the list of sightings in the current page and the total number of sightings for the given tiger. Parameters: tigerID - the ID of the tiger, page - the current page number, pageSize - the number of sightings per page."
   sightingByTiger(tigerID: ID!, page:Int!, pageSize: Int!): SightingsPagination!
 }
 
+"Input type for creating a new tiger profile."
 input NewTiger {
+  "This is the name of the tiger. It is a required field."
   name: String!
+  "This is the date of birth of the tiger in RFC3339Nano format. It is a required field."
   dateOfBirth: Time!
+  "This is the last seen date of the tiger in RFC3339Nano format. This should indicate when the tiger was last seen when the tiger profile is created. It will be updated every time a new sighting is added for the tiger."
   lastSeen: Time!
+  "This is the last seen latitude of the tiger. This should indicate the last known location of the tiger when the tiger profile is created. It will be updated every time a new sighting is added for the tiger."
   lastLatitude: Float!
+  "This is the last seen longitude of the tiger. This should indicate the last known location of the tiger when the tiger profile is created. It will be updated every time a new sighting is added for the tiger."
   lastLongitude: Float!
 }
 
+"Input type for creating a new sighting for a tiger."
 input NewSighting {
+  "This is the unique identifier of the tiger associated with the sighting. It is a required field."
   tigerID: ID!
+  "This is the date of the sighting in RFC3339Nano format. It is a required field."
   date: Time!
+  "This is the latitude of the sighting. It is a required field."
   latitude: Float!
+  "This is the longitude of the sighting. It is a required field."
   longitude: Float!
+  "This is the Multi-Part scalar for uploading image of the sighting. It is an optional field."
   image: Upload
 }
 
+"Input type for creating a new user profile."
 input NewUser {
+  "This is the username of the user. It should be a single word without spaces. It is a required field."
   name: String!
+  "This is the email of the user. It should be a valid email address and unique in the database. It is a required field."
   email: String!
+  "This is the password of the user. It is a required field."
   password: String!
 }
 
+"Mutation type for the GraphQL schema. It contains mutations that modify the data."
 type Mutation {
+  "This is a mutation to create a new tiger profile. It returns the created tiger object."
   createTiger(input: NewTiger!): Tiger!
+  "This is a mutation to create a new sighting for a tiger. It returns the created sighting object and will update the last seen date, latitude, and longitude of the tiger associated with the sighting and send email notifications to users who have contributed sightings for the tiger."
   createSighting(input: NewSighting!): Sighting!
+  "This is a mutation to create a new user profile. It returns the JWT token for the user."
   createUser(input: NewUser!): String!
+  "This is a mutation to login a user. It returns the JWT token for the user."
   login(email: String!, password: String!): String!
+  "This is a mutation to refresh the JWT token for a user. It returns the new JWT token."
   refreshToken(token: String!): String!
 }
