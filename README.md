@@ -24,7 +24,7 @@ This project is to fulfill my application as a Senior Backend Engineer at Tigerh
   - [x] Create Unit Test for User
   - [x] Create Unit Test for Tiger
 - [ ] Create Integration Test for Each Endpoint
-- [ ] Create Documentation
+- [x] Create Documentation
 - [ ] Create Dockerfile
 - [ ] Create Fly io Deployment
 - [ ] Fix Migration to use proper Migration Mechanism
