@@ -8,12 +8,15 @@ import (
 )
 
 const (
-	PORT                = "PORT"
-	ENV_FILE            = ".env"
-	LIBSQL_URL          = "LIBSQL_URL"
-	LIBSQL_TOKEN        = "LIBSQL_TOKEN"
-	JWT_SECRET          = "JWT_SECRET"
-	JWT_EXPIRY_DURATION = "JWT_EXPIRY_DURATION"
+	PORT                    = "PORT"
+	ENV_FILE                = ".env"
+	LIBSQL_URL              = "LIBSQL_URL"
+	LIBSQL_TOKEN            = "LIBSQL_TOKEN"
+	JWT_SECRET              = "JWT_SECRET"
+	JWT_EXPIRY_DURATION     = "JWT_EXPIRY_DURATION"
+	CF_ACCOUNT_ID           = "CF_ACCOUNT_ID"
+	CF_R2_ACCESS_KEY_ID     = "CF_R2_ACCESS"
+	CF_R2_SECRET_ACCESS_KEY = "CF_R2_SECRET"
 )
 
 func init() {
