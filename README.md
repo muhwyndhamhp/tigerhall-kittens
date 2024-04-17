@@ -11,13 +11,16 @@ It has 2 built-in options for GraphQL Editor / Playground:
 
 ## Infrastructure Overview
 ![Infra Overview](schema.png)
-The infrastructure follows the "Progressive Enhancement" concept, which means the system will be able to self-sustain, but will become increasingly more capable as more feature available to itself. 
+The infrastructure follows the *"Progressive Enhancement"* concept, which means the system will be able to self-sustain, but will become increasingly more capable as more feature available to itself. 
 
-One of such example is the core of the system is the GraphQL Server, which is responsible for handling the business logic and data access. The GraphQL Server is connected to Turso Database, wich uses LibSQL (SQLite fork with enhancement in distributed replica) as the core driver, but to run the app it does not requires Turso DB connection as it able to run locally, whilst the Turso DB is used for the production environment.
+One of such example is the core of the system is the GraphQL Server, which is responsible for handling the business logic and data access. 
+
+The GraphQL Server is connected to a **Turso Database**, wich uses **LibSQL** (SQLite fork with enhancement in distributed replica) as the core driver, but to run the app it does not requires Turso DB connection as it able to run locally, whilst the Turso DB is used for the production environment.
 
 The GraphQL Server also has a Message Queue, which is used to send email notifications. The Message Queue is connected to the Email Service via SendGrid. The Email Service is responsible for sending the email notifications whenever new sightings are created. 
 
-
+The Following is the example of the email sent by the system when a new sighting is created:
+![Email Example](email-sample.png)
 ## Local Setup
 ***(If You're from Tigerhall, Please Use `.env` file provided in the email I sent!!)***
 
@@ -27,6 +30,7 @@ The GraphQL Server also has a Message Queue, which is used to send email notific
 - [Air](https://github.com/cosmtrek/air) (Optional, for hot reload)
 - [Mockery](https://github.com/vektra/mockery) (Optional, for mocking interfaces)
 - [GqlGen](https://gqlgen.com/) (Optional, for generating GraphQL Schema)
+- [Fly.io CLI](https://fly.io/docs/getting-started/installing-flyctl/) (Optional, for deploying to Fly.io)
 
 ### Steps
 To run the project locally, you can follow these steps:
