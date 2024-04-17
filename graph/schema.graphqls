@@ -75,4 +75,5 @@ type Mutation {
   createSighting(input: NewSighting!): Sighting!
   createUser(input: NewUser!): String!
   login(email: String!, password: String!): String!
+  refreshToken(token: String!): String!
 }

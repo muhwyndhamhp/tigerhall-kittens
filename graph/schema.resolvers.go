@@ -61,6 +61,16 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 	return token, nil
 }
 
+// RefreshToken is the resolver for the refreshToken field.
+func (r *mutationResolver) RefreshToken(ctx context.Context, token string) (string, error) {
+	token, err := r.userUsecase.RefreshToken(ctx, token)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
 // Tigers is the resolver for the tigers field.
 func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize int) (*model.TigerPagination, error) {
 	tigers, count, err := r.tigerUsecase.GetTigers(ctx, page, pageSize)
@@ -141,7 +151,9 @@ func (r *Resolver) Sighting() SightingResolver { return &sightingResolver{r} }
 // Tiger returns TigerResolver implementation.
 func (r *Resolver) Tiger() TigerResolver { return &tigerResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
-type sightingResolver struct{ *Resolver }
-type tigerResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+	sightingResolver struct{ *Resolver }
+	tigerResolver    struct{ *Resolver }
+)
