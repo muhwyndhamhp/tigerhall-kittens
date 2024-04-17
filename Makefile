@@ -25,4 +25,5 @@ test:
 	@cat coverage.out.tmp | grep -v "_mock.go" > coverage.out
 	@go tool cover -html=coverage.out 
 
-
+deploy:
+	@fly deploy
