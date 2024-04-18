@@ -9,6 +9,8 @@ It has 2 built-in options for GraphQL Editor / Playground:
 - [Altair (Recommended)](https://tigerhall-kittens.fly.dev/altair)
 - [GraphiQL](https://tigerhall-kittens.fly.dev/graphiql)
 
+All schema is well documented, so you can access the documentation via the GraphQL Editor directly.
+![Altair Example](altair.png)
 ## Local Setup
 ***(If You're from Tigerhall, Please Use `.env` file provided in the email I sent!!)***
 
