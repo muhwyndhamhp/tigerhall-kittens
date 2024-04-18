@@ -23,7 +23,6 @@ func GetDB() *gorm.DB {
 		} else {
 			str = fmt.Sprintf("%s?authToken=%s", url, auth)
 		}
-		fmt.Println("Connection String" + str)
 
 		d, err := gorm.Open(libsql.Open(str), &gorm.Config{})
 		if err != nil {

@@ -40,7 +40,7 @@ func main() {
 	sightingRepo := sighting.NewSightingRepository(d)
 
 	userUsecase := user.NewUserUsecase(userRepo)
-	tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo)
+	tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo, s3)
 	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3, queue)
 
 	resolver := graph.NewResolver(userUsecase, tigerUsecase, sightingUsecase)
