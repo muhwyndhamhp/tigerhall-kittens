@@ -19,8 +19,8 @@ func (u *usecase) RefreshToken(ctx context.Context, token string) (string, error
 	}
 
 	usr, err := u.repo.FindByID(ctx, tu.ID)
-	if err != nil {
-		return "", err
+	if err != nil || usr == nil {
+		return "", entities.ErrUserNotFound
 	}
 
 	newToken, err := usr.GenerateToken()
@@ -78,8 +78,8 @@ func (u *usecase) CreateUser(ctx context.Context, usr *model.NewUser) (string, e
 // Login implements entities.UserUsecase.
 func (u *usecase) Login(ctx context.Context, email string, password string) (string, error) {
 	usr, err := u.repo.FindByEmail(ctx, email)
-	if err != nil {
-		return "", err
+	if err != nil || usr == nil {
+		return "", entities.ErrUserNotFound
 	}
 
 	err = usr.ValidatePassword(password)

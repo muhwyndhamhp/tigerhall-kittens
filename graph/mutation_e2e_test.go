@@ -3,6 +3,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -20,6 +21,135 @@ import (
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
+
+func TestMutation_RefreshToken(t *testing.T) {
+	now := time.Unix(1713345275, 0) // 17th March 2024 16:14:35
+	testCases := []struct {
+		name string
+
+		token string
+
+		withRandomDBErr bool
+		want            string
+		wantErr         error
+	}{
+		{
+			name:    "should return token and nil error",
+			token:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTFAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoxLCJ1c2VybmFtZSI6InVzZXItMSJ9.5NNWNlmXkRCRSGNcZzBnK3-UDJsyl2fqe8aIxj775Hk",
+			want:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTFAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoxLCJ1c2VybmFtZSI6InVzZXItMSJ9.5NNWNlmXkRCRSGNcZzBnK3-UDJsyl2fqe8aIxj775Hk",
+			wantErr: nil,
+		},
+		{
+			name:    "should return nil and error given user not found",
+			token:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTJAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoyLCJ1c2VybmFtZSI6InVzZXItMiJ9.8CnXMZ_LKB4-ogadkF4nqt707PUTbv3fiYBUM0v8DmE",
+			want:    "",
+			wantErr: errs.RespError(entities.ErrUserNotFound),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			timex.SetTestTime(now)
+			r, _, _ := Setup(t, now, tc.withRandomDBErr)
+
+			res, err := r.Mutation().RefreshToken(context.Background(), tc.token)
+
+			assert.Equal(t, tc.want, res)
+			assert.Equal(t, tc.wantErr, err)
+		})
+	}
+}
+
+func TestMutation_Login(t *testing.T) {
+	now := time.Unix(1713345275, 0) // 17th March 2024 16:14:35
+	testCases := []struct {
+		name string
+
+		email    string
+		password string
+
+		withRandomDBErr bool
+		want            string
+		wantErr         error
+	}{
+		{
+			name:     "should return token and nil error",
+			email:    "email-1@example.com",
+			password: "inipasswordnya!",
+			want:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTFAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoxLCJ1c2VybmFtZSI6InVzZXItMSJ9.5NNWNlmXkRCRSGNcZzBnK3-UDJsyl2fqe8aIxj775Hk",
+			wantErr:  nil,
+		},
+		{
+			name:     "should return nil and error given user not found",
+			email:    "email-2@example.com",
+			password: "inipasswordnya!",
+			want:     "",
+			wantErr:  errs.RespError(entities.ErrUserNotFound),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			timex.SetTestTime(now)
+			r, _, _ := Setup(t, now, tc.withRandomDBErr)
+
+			res, err := r.Mutation().Login(context.Background(), tc.email, tc.password)
+
+			fmt.Println(err)
+			assert.Equal(t, tc.want, res)
+			assert.Equal(t, tc.wantErr, err)
+		})
+	}
+}
+
+func TestMutation_CreateUser(t *testing.T) {
+	now := time.Unix(1713345275, 0) // 17th March 2024 16:14:35
+	testCases := []struct {
+		name  string
+		input model.NewUser
+
+		withRandomDBErr bool
+		want            string
+		wantErr         error
+	}{
+		{
+			name: "should return token and nil error",
+			input: model.NewUser{
+				Name:     "user-2",
+				Email:    "email-2@example.com",
+				Password: "inipasswordnya!",
+			},
+
+			withRandomDBErr: false,
+			want:            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTJAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoyLCJ1c2VybmFtZSI6InVzZXItMiJ9.8CnXMZ_LKB4-ogadkF4nqt707PUTbv3fiYBUM0v8DmE",
+			wantErr:         nil,
+		},
+		{
+			name: "should return nil and error given user already exists",
+			input: model.NewUser{
+				Name:     "user-2",
+				Email:    "email-1@example.com",
+				Password: "inipasswordnya!",
+			},
+
+			withRandomDBErr: false,
+			want:            "",
+			wantErr:         errs.RespError(entities.ErrUserAlreadyExists),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			timex.SetTestTime(now)
+			r, _, _ := Setup(t, now, tc.withRandomDBErr)
+
+			res, err := r.Mutation().CreateUser(context.Background(), tc.input)
+
+			assert.Equal(t, tc.want, res)
+			assert.Equal(t, tc.wantErr, err)
+		})
+	}
+}
 
 func TestMutation_CreateSighting(t *testing.T) {
 	now := time.Now()
@@ -294,7 +424,7 @@ func SeedDB(d *gorm.DB, now time.Time, simulateErr bool) {
 					User: &entities.User{
 						Name:         "user-1",
 						Email:        "email-1@example.com",
-						PasswordHash: "hashed-password-1",
+						PasswordHash: "$2a$10$MGPcG.T8.KzfqkwgPq9TDuiOGLi45guJQ8PQSM.yXMrjeoRs.Wi2C",
 					},
 				},
 			},

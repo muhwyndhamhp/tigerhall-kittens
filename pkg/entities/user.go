@@ -36,6 +36,11 @@ type UserRepository interface {
 }
 
 var (
+	ErrUserNotFound = errs.ServiceError{
+		ErrorCode: "ErrUserNotFound",
+		Err:       errors.New("ErrUserNotFound: user not found"),
+	}
+
 	ErrUserByCtxNotFound = errs.ServiceError{
 		ErrorCode: "ErrUserByCtxNotFound",
 		Err:       errors.New("ErrUserByCtxNotFound: user not found in context"),
