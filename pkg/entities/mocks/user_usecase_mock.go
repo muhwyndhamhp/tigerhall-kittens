@@ -89,6 +89,30 @@ func (_m *UserUsecase) Login(ctx context.Context, email string, password string)
 	return r0, r1
 }
 
+// RefreshToken provides a mock function with given fields: ctx, token
+func (_m *UserUsecase) RefreshToken(ctx context.Context, token string) (string, error) {
+	ret := _m.Called(ctx, token)
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+		return rf(ctx, token)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = rf(ctx, token)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewUserUsecase creates a new instance of UserUsecase. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewUserUsecase(t interface {

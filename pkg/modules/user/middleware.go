@@ -7,7 +7,7 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
-var keyUser = &ctxKey{"user"}
+var KeyUser = &ctxKey{"user"}
 
 type ctxKey struct {
 	name string
@@ -22,7 +22,7 @@ func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
 				return next(c)
 			}
 
-			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), keyUser, u)))
+			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), KeyUser, u)))
 
 			return next(c)
 		}
@@ -48,7 +48,7 @@ func ExtractUserFromJWT(ctx context.Context, repo entities.UserRepository, authH
 }
 
 func UserByCtx(ctx context.Context) (*entities.User, error) {
-	i := ctx.Value(keyUser)
+	i := ctx.Value(KeyUser)
 	if i == nil {
 		return nil, entities.ErrUserByCtxNotFound
 	}

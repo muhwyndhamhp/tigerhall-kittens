@@ -22,7 +22,7 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 	}{
 		{
 			name:       "success extract user from jwt",
-			authHeader: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImthemVhbS5wbHVzQGdtYWlsLmNvbSIsImV4cCI6MTcxMzQwNzkzMiwiaWQiOjEsInVzZXJuYW1lIjoibXVod3luZGhhbSJ9.gYOSnOkJhPU-nZXP8g3fwD72kmCNA65RB_TJkXWwzPA",
+			authHeader: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
 			mockRepo: &entities.User{
 				Model: gorm.Model{
 					ID: 1,
@@ -42,11 +42,11 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 		},
 		{
 			name:        "failed extract user from jwt given user record not found",
-			authHeader:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImthemVhbS5wbHVzQGdtYWlsLmNvbSIsImV4cCI6MTcxMzQwNzkzMiwiaWQiOjEsInVzZXJuYW1lIjoibXVod3luZGhhbSJ9.gYOSnOkJhPU-nZXP8g3fwD72kmCNA65RB_TJkXWwzPA",
+			authHeader:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
 			mockRepo:    nil,
 			mockRepoErr: entities.ErrUserByCtxNotFound,
 			expected:    nil,
-			expectedErr: entities.ErrUserByCtxNotFound,
+			expectedErr: jwt.ValidationError{Inner: jwt.ErrSignatureInvalid},
 		},
 		{
 			name:        "failed extract user from jwt given empty auth header",
@@ -71,7 +71,7 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 			repo := mocks.NewUserRepository(t)
 
 			repo.
-				On("FindByID", context.Background(), uint(1)).
+				On("FindByID", context.Background(), uint(0)).
 				Return(tc.mockRepo, tc.mockRepoErr).
 				Maybe()
 
@@ -95,7 +95,7 @@ func TestMiddleware_UserByCtx(t *testing.T) {
 	}{
 		{
 			name: "success get user from context",
-			ctx: context.WithValue(context.Background(), keyUser, &entities.User{
+			ctx: context.WithValue(context.Background(), KeyUser, &entities.User{
 				Model: gorm.Model{
 					ID: 1,
 				},

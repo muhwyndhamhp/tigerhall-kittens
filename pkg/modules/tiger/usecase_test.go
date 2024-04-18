@@ -8,6 +8,7 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities/mocks"
+	s3mocks "github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
@@ -43,8 +44,9 @@ func TestUsecase_CreateTiger(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			repo := mocks.NewTigerRepository(t)
 			sightingRepo := mocks.NewSightingRepository(t)
+			s3 := s3mocks.NewS3ClientInterface(t)
 
-			uc := NewTigerUsecase(repo, sightingRepo)
+			uc := NewTigerUsecase(repo, sightingRepo, s3)
 
 			repo.
 				On("Create", mock.Anything, &entities.Tiger{
@@ -118,8 +120,9 @@ func TestUsecase_GetTigerByID(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			repo := mocks.NewTigerRepository(t)
 			sightingRepo := mocks.NewSightingRepository(t)
+			s3 := s3mocks.NewS3ClientInterface(t)
 
-			uc := NewTigerUsecase(repo, sightingRepo)
+			uc := NewTigerUsecase(repo, sightingRepo, s3)
 
 			repo.
 				On("FindByID", mock.Anything, uint(1)).
@@ -185,8 +188,9 @@ func TestUsecase_GetTigers(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			repo := mocks.NewTigerRepository(t)
 			sightingRepo := mocks.NewSightingRepository(t)
+			s3 := s3mocks.NewS3ClientInterface(t)
 
-			uc := NewTigerUsecase(repo, sightingRepo)
+			uc := NewTigerUsecase(repo, sightingRepo, s3)
 
 			repo.
 				On("FindAll", mock.Anything, 1, 10).

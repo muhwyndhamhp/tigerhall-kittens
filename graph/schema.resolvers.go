@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
+	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/errs"
 )
@@ -17,6 +18,10 @@ func (r *mutationResolver) CreateTiger(ctx context.Context, input model.NewTiger
 	u, err := user.UserByCtx(ctx)
 	if err != nil {
 		return nil, errs.RespError(err)
+	}
+
+	if u.ID == 0 {
+		return nil, errs.RespError(entities.ErrUserByCtxNotFound)
 	}
 
 	t, err := r.tigerUsecase.CreateTiger(ctx, &input, u.ID)
@@ -32,6 +37,9 @@ func (r *mutationResolver) CreateSighting(ctx context.Context, input model.NewSi
 	u, err := user.UserByCtx(ctx)
 	if err != nil {
 		return nil, errs.RespError(err)
+	}
+	if u.ID == 0 {
+		return nil, errs.RespError(entities.ErrUserByCtxNotFound)
 	}
 
 	s, err := r.sightingUsecase.CreateSighting(ctx, &input, u.ID)
@@ -152,7 +160,9 @@ func (r *Resolver) Sighting() SightingResolver { return &sightingResolver{r} }
 // Tiger returns TigerResolver implementation.
 func (r *Resolver) Tiger() TigerResolver { return &tigerResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
-type sightingResolver struct{ *Resolver }
-type tigerResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+	sightingResolver struct{ *Resolver }
+	tigerResolver    struct{ *Resolver }
+)

@@ -73,8 +73,6 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 		return nil, err
 	}
 
-	go u.queueEmail(t)
-
 	m := &model.Sighting{
 		ID:        s.ID,
 		Date:      s.Date,
@@ -88,10 +86,11 @@ func (u *usecase) CreateSighting(ctx context.Context, sighting *model.NewSightin
 		m.ImageURL = &s.ImageURL
 	}
 
+	go u.queueEmail(t, s.ImageURL)
 	return m, nil
 }
 
-func (u *usecase) queueEmail(t *entities.Tiger) {
+func (u *usecase) queueEmail(t *entities.Tiger, imageURL string) {
 	fmt.Println("Sending email to other users...")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -116,10 +115,10 @@ func (u *usecase) queueEmail(t *entities.Tiger) {
 		m := email.SightingEmail{
 			DestinationEmail:  s.User.Email,
 			TigerName:         t.Name,
-			SightingDate:      s.Date.Format("2006-01-02 15:04:05"),
-			SightingLatitude:  fmt.Sprintf("%f", s.Latitude),
-			SightingLongitude: fmt.Sprintf("%f", s.Longitude),
-			ImageURL:          s.ImageURL,
+			SightingDate:      t.LastSeen.Format("2006-01-02 15:04:05"),
+			SightingLatitude:  fmt.Sprintf("%f", t.LastLatitude),
+			SightingLongitude: fmt.Sprintf("%f", t.LastLongitude),
+			ImageURL:          imageURL,
 		}
 		u.ch <- m
 
