@@ -12,6 +12,7 @@ import (
 )
 
 func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
+	token := GenerateJWT(nil)
 	testCase := []struct {
 		name        string
 		authHeader  string
@@ -22,7 +23,7 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 	}{
 		{
 			name:       "success extract user from jwt",
-			authHeader: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
+			authHeader: token,
 			mockRepo: &entities.User{
 				Model: gorm.Model{
 					ID: 1,
@@ -42,7 +43,7 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 		},
 		{
 			name:        "failed extract user from jwt given user record not found",
-			authHeader:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWwtMUBleGFtcGxlLmNvbSIsImV4cCI6MTcxMzQzMTY3NSwiaWQiOjAsInVzZXJuYW1lIjoidXNlci0xIn0.Fh37Wyj73Dig8thyavZHfVXrA6cE1hi9o1VJ7iAoW7A",
+			authHeader:  token,
 			mockRepo:    nil,
 			mockRepoErr: entities.ErrUserByCtxNotFound,
 			expected:    nil,
@@ -71,7 +72,7 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 			repo := mocks.NewUserRepository(t)
 
 			repo.
-				On("FindByID", context.Background(), uint(0)).
+				On("FindByID", context.Background(), uint(1)).
 				Return(tc.mockRepo, tc.mockRepoErr).
 				Maybe()
 

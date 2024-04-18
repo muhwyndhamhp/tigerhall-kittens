@@ -12,14 +12,14 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/errs"
-	"github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
 
 func TestMutation_RefreshToken(t *testing.T) {
-	now := time.Unix(1713345275, 0) // 17th March 2024 16:14:35
+	now := time.Now()
+	token := GenerateJWT(nil)
 	testCases := []struct {
 		name string
 
@@ -31,13 +31,13 @@ func TestMutation_RefreshToken(t *testing.T) {
 	}{
 		{
 			name:    "should return token and nil error",
-			token:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTFAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoxLCJ1c2VybmFtZSI6InVzZXItMSJ9.5NNWNlmXkRCRSGNcZzBnK3-UDJsyl2fqe8aIxj775Hk",
-			want:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTFAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoxLCJ1c2VybmFtZSI6InVzZXItMSJ9.5NNWNlmXkRCRSGNcZzBnK3-UDJsyl2fqe8aIxj775Hk",
+			token:   token,
+			want:    token,
 			wantErr: nil,
 		},
 		{
 			name:    "should return nil and error given user not found",
-			token:   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTJAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoyLCJ1c2VybmFtZSI6InVzZXItMiJ9.8CnXMZ_LKB4-ogadkF4nqt707PUTbv3fiYBUM0v8DmE",
+			token:   GenerateJWT(&entities.User{Model: gorm.Model{ID: 2}}),
 			want:    "",
 			wantErr: errs.RespError(entities.ErrUserNotFound),
 		},
@@ -45,7 +45,6 @@ func TestMutation_RefreshToken(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			timex.SetTestTime(now)
 			r, _, _ := Setup(t, now, tc.withRandomDBErr)
 
 			res, err := r.Mutation().RefreshToken(context.Background(), tc.token)
@@ -57,7 +56,8 @@ func TestMutation_RefreshToken(t *testing.T) {
 }
 
 func TestMutation_Login(t *testing.T) {
-	now := time.Unix(1713345275, 0) // 17th March 2024 16:14:35
+	now := time.Now()
+	token := GenerateJWT(nil)
 	testCases := []struct {
 		name string
 
@@ -72,7 +72,7 @@ func TestMutation_Login(t *testing.T) {
 			name:     "should return token and nil error",
 			email:    "email-1@example.com",
 			password: "inipasswordnya!",
-			want:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTFAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoxLCJ1c2VybmFtZSI6InVzZXItMSJ9.5NNWNlmXkRCRSGNcZzBnK3-UDJsyl2fqe8aIxj775Hk",
+			want:     token,
 			wantErr:  nil,
 		},
 		{
@@ -86,7 +86,6 @@ func TestMutation_Login(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			timex.SetTestTime(now)
 			r, _, _ := Setup(t, now, tc.withRandomDBErr)
 
 			res, err := r.Mutation().Login(context.Background(), tc.email, tc.password)
@@ -99,7 +98,7 @@ func TestMutation_Login(t *testing.T) {
 }
 
 func TestMutation_CreateUser(t *testing.T) {
-	now := time.Unix(1713345275, 0) // 17th March 2024 16:14:35
+	now := time.Now()
 	testCases := []struct {
 		name  string
 		input model.NewUser
@@ -117,8 +116,13 @@ func TestMutation_CreateUser(t *testing.T) {
 			},
 
 			withRandomDBErr: false,
-			want:            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsLTJAZXhhbXBsZS5jb20iLCJleHAiOjE3MTM0MzE2NzUsImlkIjoyLCJ1c2VybmFtZSI6InVzZXItMiJ9.8CnXMZ_LKB4-ogadkF4nqt707PUTbv3fiYBUM0v8DmE",
-			wantErr:         nil,
+			want: GenerateJWT(&entities.User{
+				Model:        gorm.Model{ID: 2},
+				Name:         "user-2",
+				Email:        "email-2@example.com",
+				PasswordHash: "inipasswordnya!",
+			}),
+			wantErr: nil,
 		},
 		{
 			name: "should return nil and error given user already exists",
@@ -136,7 +140,6 @@ func TestMutation_CreateUser(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			timex.SetTestTime(now)
 			r, _, _ := Setup(t, now, tc.withRandomDBErr)
 
 			res, err := r.Mutation().CreateUser(context.Background(), tc.input)

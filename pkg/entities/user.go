@@ -10,7 +10,6 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/errs"
-	"github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -97,7 +96,7 @@ func (u *User) GenerateToken() (string, error) {
 	claims["id"] = u.ID
 	claims["username"] = u.Name
 	claims["email"] = u.Email
-	claims["exp"] = timex.Now().Add(time.Second * time.Duration(exp)).Unix()
+	claims["exp"] = time.Now().Add(time.Second * time.Duration(exp)).Unix()
 	ts, err := token.SignedString(GetSecretKey())
 	if err != nil {
 		return "", err

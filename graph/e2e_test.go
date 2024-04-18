@@ -11,7 +11,6 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
 	s3mock "github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client/mocks"
-	"github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
 	"gorm.io/gorm"
 )
 
@@ -19,8 +18,6 @@ func Setup(t *testing.T, now time.Time, randomDBErr bool) (*Resolver, *s3mock.S3
 	d := db.GetTestDB()
 
 	SeedDB(d, now, randomDBErr)
-
-	timex.SetTestTime(now)
 
 	userRepo := user.NewUserRepository(d)
 	tigerRepo := tiger.NewTigerRepository(d)
@@ -91,4 +88,21 @@ func SeedDB(d *gorm.DB, now time.Time, simulateErr bool) {
 			panic(err)
 		}
 	}
+}
+
+func GenerateJWT(u *entities.User) string {
+	if u == nil {
+		u = &entities.User{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Name:         "user-1",
+			Email:        "email-1@example.com",
+			PasswordHash: "hashed-password-1",
+		}
+	}
+
+	jwt, _ := u.GenerateToken()
+
+	return jwt
 }
