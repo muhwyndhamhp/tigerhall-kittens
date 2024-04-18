@@ -10,6 +10,8 @@ It has 2 built-in options for GraphQL Editor / Playground:
 - [GraphiQL](https://tigerhall-kittens.fly.dev/graphiql)
 
 All schema is well documented, so you can access the documentation via the GraphQL Editor directly.
+*(Note: After login, you will be given a string token, you can use it to authenticate your request by adding `Authorization: <<TOKEN>>` in the header)*
+
 ![Altair Example](altair.png)
 ## Local Setup
 ***(If You're from Tigerhall, Please Use `.env` file provided in the email I sent!!)***
