@@ -55,6 +55,18 @@ go run .
 | `SENDGRID_API_KEY` | SendGrid API Key | - | Yes |
 | `SENDGRID_SENDER_EMAIL` | SendGrid Email Origin | - | Yes |
 
+### Test Coverage
+This project have implemented unit tests for each function, and integration tests for each endpoint. You can run the test by running the following command:
+```bash
+make test
+```
+or generate report into coverage.html by running:
+```bash
+make test-report
+```
+or you can just open the latest coverage report via `coverage.html` file in the root directory.
+
+
 ## Infrastructure Overview
 ![Infra Overview](schema.png)
 The infrastructure is designed to be robust and production-ready. The project is built using Golang, with the main server being a GraphQL Server that was served via Labstack Echo Web Server.
