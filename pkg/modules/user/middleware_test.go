@@ -2,14 +2,94 @@ package user
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/labstack/echo/v4"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities/mocks"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
+
+func TestMiddleware_AuthMiddleware(t *testing.T) {
+	testCase := []struct {
+		name        string
+		authHeader  string
+		mockRepo    *entities.User
+		mockRepoErr error
+		want        *entities.User
+		wantErr     error
+	}{
+		{
+			name:       "success get user from context",
+			authHeader: GenerateJWT(nil),
+			mockRepo: &entities.User{
+				Model: gorm.Model{
+					ID: 1,
+				},
+				Name:  "user-1",
+				Email: "email-1@example.com",
+			},
+			mockRepoErr: nil,
+			want: &entities.User{
+				Model: gorm.Model{
+					ID: 1,
+				},
+				Name:  "user-1",
+				Email: "email-1@example.com",
+			},
+			wantErr: nil,
+		},
+		{
+			name:       "failed get user from context",
+			authHeader: "failed-token",
+			mockRepo: &entities.User{
+				Model: gorm.Model{
+					ID: 1,
+				},
+				Name:  "user-1",
+				Email: "email-1@example.com",
+			},
+			mockRepoErr: nil,
+			want:        nil,
+			wantErr:     nil,
+		},
+	}
+
+	for _, tc := range testCase {
+		t.Run(tc.name, func(t *testing.T) {
+			repo := mocks.NewUserRepository(t)
+
+			repo.
+				On("FindByID", context.Background(), uint(1)).
+				Return(tc.mockRepo, tc.mockRepoErr).
+				Maybe()
+
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodPost, "/query", nil)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			c.Request().Header.Add("Authorization", tc.authHeader)
+
+			mw := AuthMiddleware(repo)
+
+			next := echo.HandlerFunc(func(c echo.Context) error {
+				return nil
+			})
+
+			err := mw(next)(c)
+
+			u, _ := UserByCtx(c.Request().Context())
+
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.want, u)
+		})
+	}
+}
 
 func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 	token := GenerateJWT(nil)
