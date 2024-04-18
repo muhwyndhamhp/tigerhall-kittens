@@ -36,6 +36,11 @@ make auto-migrate
 ```bash
 make run
 ```
+- If you prefer not use `Air`, then running it plain old `go run` also works:
+```bash
+go run .
+```
+
 ### Environment Variables
 | Variable Name | Description | Default Value | Required |
 | ------------- | ----------- | ------------- | -------- |
