@@ -4,5 +4,4 @@ tmp
 .DS_Store
 coverage.out
 coverage.out.tmp
-coverage.html
 kittens.db
