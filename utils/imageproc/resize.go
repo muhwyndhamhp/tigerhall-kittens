@@ -24,6 +24,7 @@ func IsContentTypeValid(contentType string, filename string) bool {
 	return true
 }
 
+// This function resizes an image to fit in 250x200 pixels bounding box (aspect ratio is maintained).
 func ResizeImage(f io.ReadSeeker, name string) (*bytes.Reader, int, error) {
 	_, err := f.Seek(0, io.SeekStart)
 	if err != nil {

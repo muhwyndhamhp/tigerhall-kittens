@@ -50,9 +50,12 @@ make run
 
 ## Infrastructure Overview
 ![Infra Overview](schema.png)
-The infrastructure follows the *"Progressive Enhancement"* concept, which means the system will be able to self-sustain, but will become increasingly more capable as more feature available to itself. 
+The infrastructure is designed to be robust and production-ready. The project is built using Golang, with the main server being a GraphQL Server that was served via Labstack Echo Web Server.
 
-One of such example is the core of the system is the GraphQL Server, which is responsible for handling the business logic and data access. 
+List of Section Documentations:
+- [Cloudflare R2 for Image CDN](utils/s3client/README.md)
+- [Email Sender Service](utils/email/README.md)
+- [Authentication Flow](pkg/entities/README.md)
 
 The GraphQL Server is connected to a **Turso Database**, wich uses **LibSQL** (SQLite fork with enhancement in distributed replica) as the core driver, but to run the app it does not requires Turso DB connection as it able to run locally, whilst the Turso DB is used for the production environment.
 

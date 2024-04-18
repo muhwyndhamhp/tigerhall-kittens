@@ -25,6 +25,7 @@ type S3ClientInterface interface {
 	UploadImage(ctx context.Context, r *bytes.Reader, filename, contentType string, size int64) (string, error)
 }
 
+// Create S3 Client that connects to R2 Cloudflare Storage
 func NewS3Client() S3ClientInterface {
 	accountId := conf.Get(conf.CF_ACCOUNT_ID)
 	accessKeyId := conf.Get(conf.CF_R2_ACCESS_KEY_ID)
@@ -50,6 +51,7 @@ func NewS3Client() S3ClientInterface {
 	return &S3Client{client}
 }
 
+// UploadImage uploads image to S3
 func (c *S3Client) UploadImage(ctx context.Context, r *bytes.Reader, filename, contentType string, size int64) (string, error) {
 	filename = AppendTimestamp(filename)
 	obj := &s3.PutObjectInput{
