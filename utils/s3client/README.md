@@ -10,3 +10,6 @@ To solve this problem, we can use Cloudflare R2 as the image CDN. Cloudflare R2 
 - Now we can deploy our service to a serverless platform, as the image is not stored in the server.
 - The image can be served with a custom domain, which can make the image URL more user-friendly.
 - Cloudflare R2 is incredibly cheap, and will not incurr Egress Cost a very good fit for serving images. 
+
+Currently, the setup for s3 client in this project would be like this:
+![Diagram of S3 Client](s3diagram.png)
