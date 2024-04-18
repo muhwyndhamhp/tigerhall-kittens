@@ -79,25 +79,27 @@
 				
 				<option value="file11">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/repository.go (80.0%)</option>
 				
-				<option value="file12">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/usecase.go (71.8%)</option>
+				<option value="file12">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/test_helper.go (100.0%)</option>
 				
-				<option value="file13">github.com/muhwyndhamhp/tigerhall-kittens/server.go (0.0%)</option>
+				<option value="file13">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/usecase.go (71.8%)</option>
 				
-				<option value="file14">github.com/muhwyndhamhp/tigerhall-kittens/utils/config/config.go (100.0%)</option>
+				<option value="file14">github.com/muhwyndhamhp/tigerhall-kittens/server.go (0.0%)</option>
 				
-				<option value="file15">github.com/muhwyndhamhp/tigerhall-kittens/utils/email/email.go (0.0%)</option>
+				<option value="file15">github.com/muhwyndhamhp/tigerhall-kittens/utils/config/config.go (100.0%)</option>
 				
-				<option value="file16">github.com/muhwyndhamhp/tigerhall-kittens/utils/errs/wrapper.go (100.0%)</option>
+				<option value="file16">github.com/muhwyndhamhp/tigerhall-kittens/utils/email/email.go (0.0%)</option>
 				
-				<option value="file17">github.com/muhwyndhamhp/tigerhall-kittens/utils/imageproc/resize.go (0.0%)</option>
+				<option value="file17">github.com/muhwyndhamhp/tigerhall-kittens/utils/errs/wrapper.go (100.0%)</option>
 				
-				<option value="file18">github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client/client.go (0.0%)</option>
+				<option value="file18">github.com/muhwyndhamhp/tigerhall-kittens/utils/imageproc/resize.go (0.0%)</option>
 				
-				<option value="file19">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/pagination.go (87.5%)</option>
+				<option value="file19">github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client/client.go (0.0%)</option>
 				
-				<option value="file20">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/preload.go (100.0%)</option>
+				<option value="file20">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/pagination.go (87.5%)</option>
 				
-				<option value="file21">github.com/muhwyndhamhp/tigerhall-kittens/utils/timex/time.go (66.7%)</option>
+				<option value="file21">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/preload.go (100.0%)</option>
+				
+				<option value="file22">github.com/muhwyndhamhp/tigerhall-kittens/utils/timex/time.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -6361,7 +6363,6 @@ import (
         "github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
         "github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
         "github.com/muhwyndhamhp/tigerhall-kittens/utils/errs"
-        "github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
         "golang.org/x/crypto/bcrypt"
         "gorm.io/gorm"
 )
@@ -6448,7 +6449,7 @@ func (u *User) GenerateToken() (string, error) <span class="cov8" title="1">{
         <span class="cov8" title="1">claims["id"] = u.ID
         claims["username"] = u.Name
         claims["email"] = u.Email
-        claims["exp"] = timex.Now().Add(time.Second * time.Duration(exp)).Unix()
+        claims["exp"] = time.Now().Add(time.Second * time.Duration(exp)).Unix()
         ts, err := token.SignedString(GetSecretKey())
         if err != nil </span><span class="cov0" title="0">{
                 return "", err
@@ -7015,6 +7016,30 @@ func NewUserRepository(db *gorm.DB) entities.UserRepository <span class="cov8" t
 		<pre class="file" id="file12" style="display: none">package user
 
 import (
+        "github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
+        "gorm.io/gorm"
+)
+
+func GenerateJWT(u *entities.User) string <span class="cov8" title="1">{
+        if u == nil </span><span class="cov8" title="1">{
+                u = &amp;entities.User{
+                        Model: gorm.Model{
+                                ID: 1,
+                        },
+                        Name:         "user-1",
+                        Email:        "email-1@example.com",
+                        PasswordHash: "inipasswordnya!",
+                }
+        }</span>
+        <span class="cov8" title="1">jwt, _ := u.GenerateToken()
+
+        return jwt</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package user
+
+import (
         "context"
 
         "github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
@@ -7114,7 +7139,7 @@ func NewUserUsecase(repo entities.UserRepository) entities.UserUsecase <span cla
 }</span>
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package main
+		<pre class="file" id="file14" style="display: none">package main
 
 import (
         "bytes"
@@ -7195,7 +7220,7 @@ func ServeAltair(c echo.Context) error <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package config
+		<pre class="file" id="file15" style="display: none">package config
 
 import (
         "fmt"
@@ -7230,7 +7255,7 @@ func Get(key string) string <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package email
+		<pre class="file" id="file16" style="display: none">package email
 
 import (
         "bytes"
@@ -7333,7 +7358,7 @@ func (c *EmailClient) QueueConsumer(msg &lt;-chan SightingEmail) <span class="co
 }
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package errs
+		<pre class="file" id="file17" style="display: none">package errs
 
 import (
         "errors"
@@ -7371,7 +7396,7 @@ func RespError(err error) error <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">package imageproc
+		<pre class="file" id="file18" style="display: none">package imageproc
 
 import (
         "bytes"
@@ -7427,7 +7452,7 @@ func ResizeImage(f io.ReadSeeker, name string) (*bytes.Reader, int, error) <span
 }
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package s3client
+		<pre class="file" id="file19" style="display: none">package s3client
 
 import (
         "bytes"
@@ -7435,13 +7460,13 @@ import (
         "fmt"
         "log"
         "path/filepath"
+        "time"
 
         "github.com/aws/aws-sdk-go-v2/aws"
         "github.com/aws/aws-sdk-go-v2/config"
         "github.com/aws/aws-sdk-go-v2/credentials"
         "github.com/aws/aws-sdk-go-v2/service/s3"
         conf "github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
-        "github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
 )
 
 type S3Client struct {
@@ -7502,12 +7527,12 @@ func (c *S3Client) UploadImage(ctx context.Context, r *bytes.Reader, filename, c
 func AppendTimestamp(fileName string) string <span class="cov0" title="0">{
         extension := filepath.Ext(fileName)
         name := fileName[0 : len(fileName)-len(extension)]
-        fileName = fmt.Sprintf("%s-%s%s", name, timex.Now().Format("20060102150405"), extension)
+        fileName = fmt.Sprintf("%s-%s%s", name, time.Now().Format("20060102150405"), extension)
         return fileName
 }</span>
 </pre>
 		
-		<pre class="file" id="file19" style="display: none">package scopes
+		<pre class="file" id="file20" style="display: none">package scopes
 
 import "gorm.io/gorm"
 
@@ -7529,7 +7554,7 @@ func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB <span class="cov8" 
 }
 </pre>
 		
-		<pre class="file" id="file20" style="display: none">package scopes
+		<pre class="file" id="file21" style="display: none">package scopes
 
 import "gorm.io/gorm"
 
@@ -7548,7 +7573,7 @@ func Preloads(ps ...Preload) func(db *gorm.DB) *gorm.DB <span class="cov8" title
 }
 </pre>
 		
-		<pre class="file" id="file21" style="display: none">package timex
+		<pre class="file" id="file22" style="display: none">package timex
 
 import "time"
 
@@ -7557,11 +7582,11 @@ import "time"
 
 var tn *time.Time
 
-func init() <span class="cov8" title="1">{
+func init() <span class="cov0" title="0">{
         tn = nil
 }</span>
 
-func SetTestTime(t time.Time) <span class="cov8" title="1">{
+func SetTestTime(t time.Time) <span class="cov0" title="0">{
         tn = &amp;t
 }</span>
 
@@ -7569,8 +7594,8 @@ func RemoveTestTime() <span class="cov0" title="0">{
         tn = nil
 }</span>
 
-func Now() time.Time <span class="cov8" title="1">{
-        if tn != nil </span><span class="cov8" title="1">{
+func Now() time.Time <span class="cov0" title="0">{
+        if tn != nil </span><span class="cov0" title="0">{
                 return *tn
         }</span>
 
