@@ -8,7 +8,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-// Mutation type for the GraphQL schema. It contains mutations that modify the data.
+// Mutation type for the GraphQL schema. It contains mutations that modify the data. Each mutation requires authentication with a valid JWT token in the header `Authorization` with the value of the token. If not, it will return an error code `ErrUserByCtxNotFound` in the `errors.extensions.code` field in the response.
 type Mutation struct {
 }
 

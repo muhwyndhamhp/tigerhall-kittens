@@ -121,11 +121,11 @@ input NewUser {
   password: String!
 }
 
-"Mutation type for the GraphQL schema. It contains mutations that modify the data."
+"Mutation type for the GraphQL schema. It contains mutations that modify the data. Each mutation requires authentication with a valid JWT token in the header `Authorization` with the value of the token. If not, it will return an error code `ErrUserByCtxNotFound` in the `errors.extensions.code` field in the response."
 type Mutation {
   "This is a mutation to create a new tiger profile. It returns the created tiger object."
   createTiger(input: NewTiger!): Tiger!
-  "This is a mutation to create a new sighting for a tiger. It returns the created sighting object and will update the last seen date, latitude, and longitude of the tiger associated with the sighting and send email notifications to users who have contributed sightings for the tiger."
+  "This is a mutation to create a new sighting for a tiger. New sighting should be more than 5 km away from the last sighting, otherwise it will be rejected with error code `ErrTigerTooClose` in the `errors.extensions.code` field in the response"
   createSighting(input: NewSighting!): Sighting!
   "This is a mutation to create a new user profile. It returns the JWT token for the user. Please use header `Authorization` with the value of the token to authenticate the user for other queries and mutations."
   createUser(input: NewUser!): String!

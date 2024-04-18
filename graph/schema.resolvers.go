@@ -9,18 +9,19 @@ import (
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/errs"
 )
 
 // CreateTiger is the resolver for the createTiger field.
 func (r *mutationResolver) CreateTiger(ctx context.Context, input model.NewTiger) (*model.Tiger, error) {
 	u, err := user.UserByCtx(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	t, err := r.tigerUsecase.CreateTiger(ctx, &input, u.ID)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	return t, nil
@@ -30,12 +31,12 @@ func (r *mutationResolver) CreateTiger(ctx context.Context, input model.NewTiger
 func (r *mutationResolver) CreateSighting(ctx context.Context, input model.NewSighting) (*model.Sighting, error) {
 	u, err := user.UserByCtx(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	s, err := r.sightingUsecase.CreateSighting(ctx, &input, u.ID)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	return s, nil
@@ -45,7 +46,7 @@ func (r *mutationResolver) CreateSighting(ctx context.Context, input model.NewSi
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
 	token, err := r.userUsecase.CreateUser(ctx, &input)
 	if err != nil {
-		return "", err
+		return "", errs.RespError(err)
 	}
 
 	return token, nil
@@ -55,7 +56,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 func (r *mutationResolver) Login(ctx context.Context, email string, password string) (string, error) {
 	token, err := r.userUsecase.Login(ctx, email, password)
 	if err != nil {
-		return "", err
+		return "", errs.RespError(err)
 	}
 
 	return token, nil
@@ -65,7 +66,7 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 func (r *mutationResolver) RefreshToken(ctx context.Context, token string) (string, error) {
 	token, err := r.userUsecase.RefreshToken(ctx, token)
 	if err != nil {
-		return "", err
+		return "", errs.RespError(err)
 	}
 
 	return token, nil
@@ -75,7 +76,7 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, token string) (stri
 func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize int) (*model.TigerPagination, error) {
 	tigers, count, err := r.tigerUsecase.GetTigers(ctx, page, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	return &model.TigerPagination{
@@ -88,7 +89,7 @@ func (r *queryResolver) Tigers(ctx context.Context, page int, pageSize int) (*mo
 func (r *queryResolver) SightingByTiger(ctx context.Context, tigerID uint, page int, pageSize int) (*model.SightingsPagination, error) {
 	sightings, count, err := r.sightingUsecase.GetSightingsByTigerID(ctx, tigerID, page, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	return &model.SightingsPagination{
@@ -105,7 +106,7 @@ func (r *sightingResolver) Tiger(ctx context.Context, obj *model.Sighting) (*mod
 
 	t, err := r.tigerUsecase.GetTigerByID(ctx, obj.TigerID)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	return t, nil
@@ -119,7 +120,7 @@ func (r *sightingResolver) User(ctx context.Context, obj *model.Sighting) (*mode
 
 	u, err := r.userUsecase.GetUserByID(ctx, obj.UserID)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	return u, nil
@@ -133,7 +134,7 @@ func (r *tigerResolver) Sightings(ctx context.Context, obj *model.Tiger) ([]*mod
 
 	sightings, _, err := r.sightingUsecase.GetSightingsByTigerID(ctx, obj.ID, 0, 0)
 	if err != nil {
-		return nil, err
+		return nil, errs.RespError(err)
 	}
 
 	return sightings, nil

@@ -58,6 +58,7 @@ List of Section Documentations:
 - [Cloudflare R2 for Image CDN](utils/s3client/README.md)
 - [Email Sender Service](utils/email/README.md)
 - [Authentication Flow](pkg/entities/README.md)
+- [Error Handling](utils/errs/README.md)
 
 The GraphQL Server is connected to a **Turso Database**, wich uses **LibSQL** (SQLite fork with enhancement in distributed replica) as the core driver, but to run the app it does not requires Turso DB connection as it able to run locally, whilst the Turso DB is used for the production environment.
 
@@ -113,4 +114,4 @@ This project uses several techs so it can be more robust and production-ready. T
 - [x] Create Dockerfile
 - [x] Create Fly io Deployment
 - [ ] Fix Migration to use proper Migration Mechanism
-- [ ] Better Error Presentation (Maybe add extensions by appending error codes?)
+- [x] Better Error Presentation (Maybe add extensions by appending error codes?)

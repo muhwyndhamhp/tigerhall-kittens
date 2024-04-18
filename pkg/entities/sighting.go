@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/errs"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes"
 	"gorm.io/gorm"
 )
@@ -22,8 +23,14 @@ type Sighting struct {
 }
 
 var (
-	ErrTigerTooClose    = errors.New("ErrTigerTooClose: tiger is too close, new sightings should be at least more than 5km away from the last sighting")
-	ErrInvalidImageType = errors.New("ErrInvalidImageType: invalid image type, only jpeg, jpg, and png are allowed")
+	ErrTigerTooClose = errs.ServiceError{
+		ErrorCode: "ErrTigerTooClose",
+		Err:       errors.New("ErrTigerTooClose: tiger is too close, new sightings should be at least more than 5km away from the last sighting"),
+	}
+	ErrInvalidImageType = errs.ServiceError{
+		ErrorCode: "ErrInvalidImageType",
+		Err:       errors.New("ErrInvalidImageType: invalid image type, only jpeg, jpg, and png are allowed"),
+	}
 )
 
 type SightingUsecase interface {

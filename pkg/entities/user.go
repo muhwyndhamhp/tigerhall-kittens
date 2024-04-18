@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
+	"github.com/muhwyndhamhp/tigerhall-kittens/utils/errs"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/timex"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -35,8 +36,15 @@ type UserRepository interface {
 }
 
 var (
-	ErrUserByCtxNotFound = errors.New("ErrUserByCtxNotFound: user not found in context")
-	ErrUserAlreadyExists = errors.New("ErrUserAlreadyExists: user already exists")
+	ErrUserByCtxNotFound = errs.ServiceError{
+		ErrorCode: "ErrUserByCtxNotFound",
+		Err:       errors.New("ErrUserByCtxNotFound: user not found in context"),
+	}
+
+	ErrUserAlreadyExists = errs.ServiceError{
+		ErrorCode: "ErrUserAlreadyExists",
+		Err:       errors.New("ErrUserAlreadyExists: user already exists"),
+	}
 )
 
 // Password Hashing Implementation
