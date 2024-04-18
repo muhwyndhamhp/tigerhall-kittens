@@ -102,7 +102,7 @@ This project uses several techs so it can be more robust and production-ready. T
 - [x] Create new GraphQL Server with GqlGen
 - [x] Create Schema for `User`, `Tiger`, and `Sighting`
 - [x] Connect Turso DB
-- ~~[ ] Create Migration mechanism (Probably using Automigrate Dry Run & gomigrate)~~
+- [ ] ~~Create Migration mechanism (Probably using Automigrate Dry Run & gomigrate)~~
 - [x] Create Automigrate
 - [x] Create Auth Implementation using JWT and Middleware
 - [x] Create CRUD for `User`, `Tiger`, and `Sighting` w/ Pagination
@@ -114,9 +114,9 @@ This project uses several techs so it can be more robust and production-ready. T
   - [x] Create Unit Test for Sighting
   - [x] Create Unit Test for User
   - [x] Create Unit Test for Tiger
-- [ ] Create Integration Test for Each Endpoint
+- [x] Create Integration Test for Each Endpoint
 - [x] Create Documentation
 - [x] Create Dockerfile
 - [x] Create Fly io Deployment
-- [ ] Fix Migration to use proper Migration Mechanism
+- [ ] ~~Fix Migration to use proper Migration Mechanism~~
 - [x] Better Error Presentation (Maybe add extensions by appending error codes?)
