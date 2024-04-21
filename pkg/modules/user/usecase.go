@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
@@ -33,6 +35,13 @@ func (u *usecase) RefreshToken(ctx context.Context, token string) (string, error
 	if err != nil {
 		return "", err
 	}
+
+	go func() {
+		err = u.tokenRepo.Create(context.Background(), &entities.TokenHistory{Token: token, RevokedAt: time.Now()})
+		if err != nil {
+			fmt.Println("Error creating token history")
+		}
+	}()
 
 	return newToken, nil
 }

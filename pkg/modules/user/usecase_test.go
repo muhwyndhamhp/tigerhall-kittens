@@ -218,6 +218,11 @@ func TestUsecase_RefreshToken(t *testing.T) {
 				}, tc.findByIDErr).
 				Maybe()
 
+			tr.
+				On("Create", mock.Anything, mock.Anything).
+				Return(nil).
+				Maybe()
+
 			token, err := uc.RefreshToken(context.Background(), tc.token)
 
 			assert.Equal(t, tc.wantErr, err)
