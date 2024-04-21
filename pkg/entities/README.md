@@ -35,3 +35,14 @@ We're using `bcrypt` for hashing the password. The flow is as follows:
 2. The server will hash the password using `bcrypt` and store it in the database.
 3. The server will compare the hashed password with the password stored in the database.
 
+## Token Invalidation and Refresh Token
+As token do have expiration date (24 hours), we need to make sure that user have the best user experience possible without required to login every 24 hours. We can achieve this by using Refresh Token. As we're using basic auth via JWT, we don't really have refresh token itself. So the implementation is a bit simplistic, but no less secure. 
+
+There are no risk if token being reused far after it's expiration date, as the JWT itself has expiration mechanism and won't parse if the token is expired. The only risk is if the token is being used after it's invalidated. But this is a risk that we can take, as the token is invalidated after it's refreshed.
+
+The flow to handle those scenarios is as follows:
+- When user login, we will generate a new JWT token with 24 hours expiration date.
+- Ideally when user do another request, client should decide whether the token is almost expired or not. If it's almost expired, client should request a new token by sending the old token to the server.
+- When token is refreshed, the old token will be recorded in the database as invalidated token. So if the old token is used, server will return an error.
+- If the token is invalidated, user should login again to get a new token.
+
