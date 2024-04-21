@@ -36,6 +36,7 @@ func GetDB() *gorm.DB {
 	return db
 }
 
+// Turso has 100% compatibility with SQLite, so we can just use SQLite for testing.
 func GetTestDB() *gorm.DB {
 	d, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {

@@ -76,6 +76,7 @@ List of Section Documentations:
 - [Email Sender Service](utils/email/README.md)
 - [Authentication Flow](pkg/entities/README.md)
 - [Error Handling](utils/errs/README.md)
+- [Turso Database](db/README.md)
 
 The GraphQL Server is connected to a **Turso Database**, wich uses **LibSQL** (SQLite fork with enhancement in distributed replica) as the core driver, but to run the app it does not requires Turso DB connection as it able to run locally, whilst the Turso DB is used for the production environment.
 
