@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	geo "github.com/kellydunn/golang-geo"
+	"github.com/labstack/gommon/log"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
@@ -102,7 +103,7 @@ func (u *usecase) queueEmail(t *entities.Tiger, imageURL string) {
 		},
 	}, 1, 1000)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return
 	}
 

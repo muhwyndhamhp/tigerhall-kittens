@@ -151,6 +151,7 @@ func GetDB() *gorm.DB <span class="cov0" title="0">{
         <span class="cov0" title="0">return db</span>
 }
 
+// Turso has 100% compatibility with SQLite, so we can just use SQLite for testing.
 func GetTestDB() *gorm.DB <span class="cov8" title="1">{
         d, err := gorm.Open(sqlite.Open(":memory:"), &amp;gorm.Config{})
         if err != nil </span><span class="cov0" title="0">{
@@ -6560,6 +6561,7 @@ import (
         "fmt"
 
         geo "github.com/kellydunn/golang-geo"
+        "github.com/labstack/gommon/log"
         "github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
         "github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
@@ -6657,7 +6659,7 @@ func (u *usecase) queueEmail(t *entities.Tiger, imageURL string) <span class="co
                 },
         }, 1, 1000)
         if err != nil </span><span class="cov0" title="0">{
-                fmt.Println(err)
+                log.Error(err)
                 return
         }</span>
 
@@ -6966,6 +6968,7 @@ import (
         "context"
 
         "github.com/labstack/echo/v4"
+        "github.com/labstack/gommon/log"
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
@@ -6981,6 +6984,7 @@ func AuthMiddleware(ur entities.UserRepository, tr entities.TokenHistoryReposito
                         authHeader := c.Request().Header.Get("Authorization")
                         u, err := ExtractUserFromJWT(c.Request().Context(), ur, tr, authHeader)
                         if err != nil </span><span class="cov8" title="1">{
+                                log.Error(err)
                                 return next(c)
                         }</span>
 
@@ -7103,9 +7107,10 @@ func GenerateJWT(u *entities.User) string <span class="cov8" title="1">{
 
 import (
         "context"
-        "fmt"
+        "errors"
         "time"
 
+        "github.com/labstack/gommon/log"
         "github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
@@ -7140,7 +7145,7 @@ func (u *usecase) RefreshToken(ctx context.Context, token string) (string, error
         <span class="cov8" title="1">go func() </span><span class="cov8" title="1">{
                 err = u.tokenRepo.Create(context.Background(), &amp;entities.TokenHistory{Token: token, RevokedAt: time.Now()})
                 if err != nil </span><span class="cov0" title="0">{
-                        fmt.Println("Error creating token history")
+                        log.Error(errors.New("error creating token history"))
                 }</span>
         }()
 

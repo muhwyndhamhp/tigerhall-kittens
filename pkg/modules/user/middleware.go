@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
@@ -19,6 +20,7 @@ func AuthMiddleware(ur entities.UserRepository, tr entities.TokenHistoryReposito
 			authHeader := c.Request().Header.Get("Authorization")
 			u, err := ExtractUserFromJWT(c.Request().Context(), ur, tr, authHeader)
 			if err != nil {
+				log.Error(err)
 				return next(c)
 			}
 
