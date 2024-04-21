@@ -75,31 +75,31 @@
 				
 				<option value="file9">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tiger/usecase.go (58.1%)</option>
 				
-				<option value="file10">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/middleware.go (63.6%)</option>
+				<option value="file10">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tokenhistory/repository.go (100.0%)</option>
 				
-				<option value="file11">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/repository.go (80.0%)</option>
+				<option value="file11">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/middleware.go (100.0%)</option>
 				
-				<option value="file12">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/test_helper.go (100.0%)</option>
+				<option value="file12">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/repository.go (80.0%)</option>
 				
-				<option value="file13">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/usecase.go (71.8%)</option>
+				<option value="file13">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/test_helper.go (100.0%)</option>
 				
-				<option value="file14">github.com/muhwyndhamhp/tigerhall-kittens/server.go (0.0%)</option>
+				<option value="file14">github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user/usecase.go (71.7%)</option>
 				
-				<option value="file15">github.com/muhwyndhamhp/tigerhall-kittens/utils/config/config.go (100.0%)</option>
+				<option value="file15">github.com/muhwyndhamhp/tigerhall-kittens/server.go (0.0%)</option>
 				
-				<option value="file16">github.com/muhwyndhamhp/tigerhall-kittens/utils/email/email.go (0.0%)</option>
+				<option value="file16">github.com/muhwyndhamhp/tigerhall-kittens/utils/config/config.go (100.0%)</option>
 				
-				<option value="file17">github.com/muhwyndhamhp/tigerhall-kittens/utils/errs/wrapper.go (100.0%)</option>
+				<option value="file17">github.com/muhwyndhamhp/tigerhall-kittens/utils/email/email.go (0.0%)</option>
 				
-				<option value="file18">github.com/muhwyndhamhp/tigerhall-kittens/utils/imageproc/resize.go (0.0%)</option>
+				<option value="file18">github.com/muhwyndhamhp/tigerhall-kittens/utils/errs/wrapper.go (100.0%)</option>
 				
-				<option value="file19">github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client/client.go (0.0%)</option>
+				<option value="file19">github.com/muhwyndhamhp/tigerhall-kittens/utils/imageproc/resize.go (0.0%)</option>
 				
-				<option value="file20">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/pagination.go (87.5%)</option>
+				<option value="file20">github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client/client.go (0.0%)</option>
 				
-				<option value="file21">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/preload.go (100.0%)</option>
+				<option value="file21">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/pagination.go (87.5%)</option>
 				
-				<option value="file22">github.com/muhwyndhamhp/tigerhall-kittens/utils/timex/time.go (0.0%)</option>
+				<option value="file22">github.com/muhwyndhamhp/tigerhall-kittens/utils/scopes/preload.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -183,9 +183,18 @@ func main() <span class="cov0" title="0">{
                 d = d.Debug()
         }</span>
 
-        <span class="cov0" title="0">runAutoMigrate(d)</span>
+        // runAutoMigrate(d)
+        <span class="cov0" title="0">addTokenHistory(d)</span>
 }
 
+func addTokenHistory(d *gorm.DB) <span class="cov0" title="0">{
+        err := d.AutoMigrate(&amp;entities.TokenHistory{})
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+}
+
+// nolint unused
 func runAutoMigrate(d *gorm.DB) <span class="cov0" title="0">{
         err := d.AutoMigrate(&amp;entities.User{})
         if err != nil </span><span class="cov0" title="0">{
@@ -6402,6 +6411,11 @@ var (
                 ErrorCode: "ErrUserAlreadyExists",
                 Err:       errors.New("ErrUserAlreadyExists: user already exists"),
         }
+
+        ErrTokenAlreadyInvalidated = errs.ServiceError{
+                ErrorCode: "ErrTokenAlreadyInvalidated",
+                Err:       errors.New("ErrTokenAlreadyInvalidated: token already invalidated"),
+        }
 )
 
 // Password Hashing Implementation
@@ -6903,7 +6917,50 @@ func NewTigerUsecase(
 }</span>
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package user
+		<pre class="file" id="file10" style="display: none">package tokenhistory
+
+import (
+        "context"
+
+        "github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
+        "gorm.io/gorm"
+)
+
+type repo struct {
+        db *gorm.DB
+}
+
+// Create implements entities.TokenHistoryRepository.
+func (r *repo) Create(ctx context.Context, token *entities.TokenHistory) error <span class="cov8" title="1">{
+        err := r.db.WithContext(ctx).Create(token).Error
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// FindByToken implements entities.TokenHistoryRepository.
+func (r *repo) FindByToken(ctx context.Context, token string) (*entities.TokenHistory, error) <span class="cov8" title="1">{
+        var res entities.TokenHistory
+        err := r.db.
+                WithContext(ctx).
+                Where("token = ?", token).
+                First(&amp;res).
+                Error
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;res, nil</span>
+}
+
+func NewTokenHistoryRepository(db *gorm.DB) entities.TokenHistoryRepository <span class="cov8" title="1">{
+        return &amp;repo{db}
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package user
 
 import (
         "context"
@@ -6918,25 +6975,30 @@ type ctxKey struct {
         name string
 }
 
-func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc <span class="cov0" title="0">{
-        return func(next echo.HandlerFunc) echo.HandlerFunc </span><span class="cov0" title="0">{
-                return func(c echo.Context) error </span><span class="cov0" title="0">{
+func AuthMiddleware(ur entities.UserRepository, tr entities.TokenHistoryRepository) echo.MiddlewareFunc <span class="cov8" title="1">{
+        return func(next echo.HandlerFunc) echo.HandlerFunc </span><span class="cov8" title="1">{
+                return func(c echo.Context) error </span><span class="cov8" title="1">{
                         authHeader := c.Request().Header.Get("Authorization")
-                        u, err := ExtractUserFromJWT(c.Request().Context(), repo, authHeader)
-                        if err != nil </span><span class="cov0" title="0">{
+                        u, err := ExtractUserFromJWT(c.Request().Context(), ur, tr, authHeader)
+                        if err != nil </span><span class="cov8" title="1">{
                                 return next(c)
                         }</span>
 
-                        <span class="cov0" title="0">c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), KeyUser, u)))
+                        <span class="cov8" title="1">c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), KeyUser, u)))
 
                         return next(c)</span>
                 }
         }
 }
 
-func ExtractUserFromJWT(ctx context.Context, repo entities.UserRepository, authHeader string) (*entities.User, error) <span class="cov8" title="1">{
+func ExtractUserFromJWT(ctx context.Context, ur entities.UserRepository, tr entities.TokenHistoryRepository, authHeader string) (*entities.User, error) <span class="cov8" title="1">{
         if authHeader == "" </span><span class="cov8" title="1">{
                 return nil, entities.ErrUserByCtxNotFound
+        }</span>
+
+        <span class="cov8" title="1">t, _ := tr.FindByToken(ctx, authHeader)
+        if t != nil </span><span class="cov8" title="1">{
+                return nil, entities.ErrTokenAlreadyInvalidated
         }</span>
 
         <span class="cov8" title="1">tu, err := entities.ParseToken(authHeader)
@@ -6944,7 +7006,7 @@ func ExtractUserFromJWT(ctx context.Context, repo entities.UserRepository, authH
                 return nil, err
         }</span>
 
-        <span class="cov8" title="1">u, err := repo.FindByID(ctx, tu.ID)
+        <span class="cov8" title="1">u, err := ur.FindByID(ctx, tu.ID)
         if err != nil || u == nil </span><span class="cov8" title="1">{
                 return nil, entities.ErrUserByCtxNotFound
         }</span>
@@ -6963,7 +7025,7 @@ func UserByCtx(ctx context.Context) (*entities.User, error) <span class="cov8" t
 }
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package user
+		<pre class="file" id="file12" style="display: none">package user
 
 import (
         "context"
@@ -7013,7 +7075,7 @@ func NewUserRepository(db *gorm.DB) entities.UserRepository <span class="cov8" t
 }</span>
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package user
+		<pre class="file" id="file13" style="display: none">package user
 
 import (
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
@@ -7037,22 +7099,30 @@ func GenerateJWT(u *entities.User) string <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package user
+		<pre class="file" id="file14" style="display: none">package user
 
 import (
         "context"
+        "fmt"
+        "time"
 
         "github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 )
 
 type usecase struct {
-        repo entities.UserRepository
+        repo      entities.UserRepository
+        tokenRepo entities.TokenHistoryRepository
 }
 
 // RefreshToken implements entities.UserUsecase.
 func (u *usecase) RefreshToken(ctx context.Context, token string) (string, error) <span class="cov8" title="1">{
-        tu, err := entities.ParseToken(token)
+        t, _ := u.tokenRepo.FindByToken(ctx, token)
+        if t != nil </span><span class="cov0" title="0">{
+                return "", entities.ErrTokenAlreadyInvalidated
+        }</span>
+
+        <span class="cov8" title="1">tu, err := entities.ParseToken(token)
         if err != nil </span><span class="cov0" title="0">{
                 return "", err
         }</span>
@@ -7066,6 +7136,13 @@ func (u *usecase) RefreshToken(ctx context.Context, token string) (string, error
         if err != nil </span><span class="cov0" title="0">{
                 return "", err
         }</span>
+
+        <span class="cov8" title="1">go func() </span><span class="cov8" title="1">{
+                err = u.tokenRepo.Create(context.Background(), &amp;entities.TokenHistory{Token: token, RevokedAt: time.Now()})
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Error creating token history")
+                }</span>
+        }()
 
         <span class="cov8" title="1">return newToken, nil</span>
 }
@@ -7134,12 +7211,12 @@ func (u *usecase) Login(ctx context.Context, email string, password string) (str
         <span class="cov8" title="1">return token, nil</span>
 }
 
-func NewUserUsecase(repo entities.UserRepository) entities.UserUsecase <span class="cov8" title="1">{
-        return &amp;usecase{repo}
+func NewUserUsecase(r entities.UserRepository, tr entities.TokenHistoryRepository) entities.UserUsecase <span class="cov8" title="1">{
+        return &amp;usecase{r, tr}
 }</span>
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package main
+		<pre class="file" id="file15" style="display: none">package main
 
 import (
         "bytes"
@@ -7154,6 +7231,7 @@ import (
         "github.com/muhwyndhamhp/tigerhall-kittens/graph"
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/sighting"
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tiger"
+        "github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tokenhistory"
         "github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
         "github.com/muhwyndhamhp/tigerhall-kittens/utils/config"
         "github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
@@ -7179,15 +7257,16 @@ func main() <span class="cov0" title="0">{
         userRepo := user.NewUserRepository(d)
         tigerRepo := tiger.NewTigerRepository(d)
         sightingRepo := sighting.NewSightingRepository(d)
+        tokenRepo := tokenhistory.NewTokenHistoryRepository(d)
 
-        userUsecase := user.NewUserUsecase(userRepo)
+        userUsecase := user.NewUserUsecase(userRepo, tokenRepo)
         tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo, s3)
         sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, s3, queue)
 
         resolver := graph.NewResolver(userUsecase, tigerUsecase, sightingUsecase)
         srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
-        e.Use(user.AuthMiddleware(userRepo))
+        e.Use(user.AuthMiddleware(userRepo, tokenRepo))
         e.GET("/graphiql", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
         e.POST("/query", echo.WrapHandler(srv))
         e.GET("/altair", ServeAltair)
@@ -7220,7 +7299,7 @@ func ServeAltair(c echo.Context) error <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package config
+		<pre class="file" id="file16" style="display: none">package config
 
 import (
         "fmt"
@@ -7255,11 +7334,10 @@ func Get(key string) string <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package email
+		<pre class="file" id="file17" style="display: none">package email
 
 import (
         "bytes"
-        "encoding/json"
         "fmt"
         "html/template"
         "log"
@@ -7302,15 +7380,12 @@ func (c *EmailClient) SendSightingEmail(s *SightingEmail) error <span class="cov
 
         message := mail.NewSingleEmail(from, subject, to, plain, html)
 
-        res, err := c.sg.Send(message)
+        _, err = c.sg.Send(message)
         if err != nil </span><span class="cov0" title="0">{
                 return err
         }</span>
 
-        <span class="cov0" title="0">js, _ := json.MarshalIndent(res, "", "  ")
-        fmt.Println(string(js))
-
-        return nil</span>
+        <span class="cov0" title="0">return nil</span>
 }
 
 func (c *EmailClient) RenderPlainStr(s *SightingEmail) string <span class="cov0" title="0">{
@@ -7358,7 +7433,7 @@ func (c *EmailClient) QueueConsumer(msg &lt;-chan SightingEmail) <span class="co
 }
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">package errs
+		<pre class="file" id="file18" style="display: none">package errs
 
 import (
         "errors"
@@ -7396,7 +7471,7 @@ func RespError(err error) error <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package imageproc
+		<pre class="file" id="file19" style="display: none">package imageproc
 
 import (
         "bytes"
@@ -7452,7 +7527,7 @@ func ResizeImage(f io.ReadSeeker, name string) (*bytes.Reader, int, error) <span
 }
 </pre>
 		
-		<pre class="file" id="file19" style="display: none">package s3client
+		<pre class="file" id="file20" style="display: none">package s3client
 
 import (
         "bytes"
@@ -7532,7 +7607,7 @@ func AppendTimestamp(fileName string) string <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file20" style="display: none">package scopes
+		<pre class="file" id="file21" style="display: none">package scopes
 
 import "gorm.io/gorm"
 
@@ -7554,7 +7629,7 @@ func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB <span class="cov8" 
 }
 </pre>
 		
-		<pre class="file" id="file21" style="display: none">package scopes
+		<pre class="file" id="file22" style="display: none">package scopes
 
 import "gorm.io/gorm"
 
@@ -7570,36 +7645,6 @@ func Preloads(ps ...Preload) func(db *gorm.DB) *gorm.DB <span class="cov8" title
                 }</span>
                 <span class="cov8" title="1">return db</span>
         }
-}
-</pre>
-		
-		<pre class="file" id="file22" style="display: none">package timex
-
-import "time"
-
-// Mock time.Now() function
-// This function is used to mock time.Now() function in the test.
-
-var tn *time.Time
-
-func init() <span class="cov0" title="0">{
-        tn = nil
-}</span>
-
-func SetTestTime(t time.Time) <span class="cov0" title="0">{
-        tn = &amp;t
-}</span>
-
-func RemoveTestTime() <span class="cov0" title="0">{
-        tn = nil
-}</span>
-
-func Now() time.Time <span class="cov0" title="0">{
-        if tn != nil </span><span class="cov0" title="0">{
-                return *tn
-        }</span>
-
-        <span class="cov0" title="0">return time.Now()</span>
 }
 </pre>
 		
