@@ -8,11 +8,17 @@ import (
 )
 
 type usecase struct {
-	repo entities.UserRepository
+	repo      entities.UserRepository
+	tokenRepo entities.TokenHistoryRepository
 }
 
 // RefreshToken implements entities.UserUsecase.
 func (u *usecase) RefreshToken(ctx context.Context, token string) (string, error) {
+	t, _ := u.tokenRepo.FindByToken(ctx, token)
+	if t != nil {
+		return "", entities.ErrTokenAlreadyInvalidated
+	}
+
 	tu, err := entities.ParseToken(token)
 	if err != nil {
 		return "", err
@@ -95,6 +101,6 @@ func (u *usecase) Login(ctx context.Context, email string, password string) (str
 	return token, nil
 }
 
-func NewUserUsecase(repo entities.UserRepository) entities.UserUsecase {
-	return &usecase{repo}
+func NewUserUsecase(r entities.UserRepository, tr entities.TokenHistoryRepository) entities.UserUsecase {
+	return &usecase{r, tr}
 }

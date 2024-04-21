@@ -49,6 +49,11 @@ var (
 		ErrorCode: "ErrUserAlreadyExists",
 		Err:       errors.New("ErrUserAlreadyExists: user already exists"),
 	}
+
+	ErrTokenAlreadyInvalidated = errs.ServiceError{
+		ErrorCode: "ErrTokenAlreadyInvalidated",
+		Err:       errors.New("ErrTokenAlreadyInvalidated: token already invalidated"),
+	}
 )
 
 // Password Hashing Implementation

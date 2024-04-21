@@ -8,6 +8,7 @@ import (
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/sighting"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tiger"
+	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/tokenhistory"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
 	"github.com/muhwyndhamhp/tigerhall-kittens/utils/email"
 	s3mock "github.com/muhwyndhamhp/tigerhall-kittens/utils/s3client/mocks"
@@ -22,12 +23,13 @@ func Setup(t *testing.T, now time.Time, randomDBErr bool) (*Resolver, *s3mock.S3
 	userRepo := user.NewUserRepository(d)
 	tigerRepo := tiger.NewTigerRepository(d)
 	sightingRepo := sighting.NewSightingRepository(d)
+	tokenRepo := tokenhistory.NewTokenHistoryRepository(d)
 
 	mockS3 := s3mock.NewS3ClientInterface(t)
 
 	emailQueue := make(chan email.SightingEmail)
 
-	userUsecase := user.NewUserUsecase(userRepo)
+	userUsecase := user.NewUserUsecase(userRepo, tokenRepo)
 	tigerUsecase := tiger.NewTigerUsecase(tigerRepo, sightingRepo, mockS3)
 	sightingUsecase := sighting.NewSightingUsecase(sightingRepo, tigerRepo, userRepo, mockS3, emailQueue)
 

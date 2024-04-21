@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
 
@@ -61,11 +63,17 @@ func TestMiddleware_AuthMiddleware(t *testing.T) {
 
 	for _, tc := range testCase {
 		t.Run(tc.name, func(t *testing.T) {
-			repo := mocks.NewUserRepository(t)
+			ur := mocks.NewUserRepository(t)
+			tr := mocks.NewTokenHistoryRepository(t)
 
-			repo.
-				On("FindByID", context.Background(), uint(1)).
+			ur.
+				On("FindByID", mock.Anything, uint(1)).
 				Return(tc.mockRepo, tc.mockRepoErr).
+				Maybe()
+
+			tr.
+				On("FindByToken", mock.Anything, tc.authHeader).
+				Return(nil, nil).
 				Maybe()
 
 			e := echo.New()
@@ -75,7 +83,7 @@ func TestMiddleware_AuthMiddleware(t *testing.T) {
 
 			c.Request().Header.Add("Authorization", tc.authHeader)
 
-			mw := AuthMiddleware(repo)
+			mw := AuthMiddleware(ur, tr)
 
 			next := echo.HandlerFunc(func(c echo.Context) error {
 				return nil
@@ -96,6 +104,7 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 	testCase := []struct {
 		name        string
 		authHeader  string
+		mockToken   *entities.TokenHistory
 		mockRepo    *entities.User
 		mockRepoErr error
 		expected    *entities.User
@@ -145,18 +154,42 @@ func TestMiddleware_ExtractUserFromJWT(t *testing.T) {
 			expected:    nil,
 			expectedErr: jwt.ValidationError{Inner: jwt.ErrSignatureInvalid},
 		},
+		{
+			name:       "failed extract user from jwt given token already invalidated",
+			authHeader: token,
+			mockToken: &entities.TokenHistory{
+				Token:     token,
+				RevokedAt: time.Now(),
+			},
+			mockRepo: &entities.User{
+				Model: gorm.Model{
+					ID: 1,
+				},
+				Name:  "user-1",
+				Email: "email-1@example.com",
+			},
+			mockRepoErr: nil,
+			expected:    nil,
+			expectedErr: entities.ErrTokenAlreadyInvalidated,
+		},
 	}
 
 	for _, tc := range testCase {
 		t.Run(tc.name, func(t *testing.T) {
-			repo := mocks.NewUserRepository(t)
+			ur := mocks.NewUserRepository(t)
+			tr := mocks.NewTokenHistoryRepository(t)
 
-			repo.
-				On("FindByID", context.Background(), uint(1)).
+			ur.
+				On("FindByID", mock.Anything, uint(1)).
 				Return(tc.mockRepo, tc.mockRepoErr).
 				Maybe()
 
-			u, err := ExtractUserFromJWT(context.Background(), repo, tc.authHeader)
+			tr.
+				On("FindByToken", mock.Anything, tc.authHeader).
+				Return(tc.mockToken, nil).
+				Maybe()
+
+			u, err := ExtractUserFromJWT(context.Background(), ur, tr, tc.authHeader)
 			assert.Equal(t, tc.expected, u)
 			if tc.expectedErr == entities.ErrUserByCtxNotFound {
 				assert.Equal(t, tc.expectedErr, err)

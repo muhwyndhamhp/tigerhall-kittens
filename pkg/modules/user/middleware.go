@@ -13,11 +13,11 @@ type ctxKey struct {
 	name string
 }
 
-func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
+func AuthMiddleware(ur entities.UserRepository, tr entities.TokenHistoryRepository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
-			u, err := ExtractUserFromJWT(c.Request().Context(), repo, authHeader)
+			u, err := ExtractUserFromJWT(c.Request().Context(), ur, tr, authHeader)
 			if err != nil {
 				return next(c)
 			}
@@ -29,9 +29,14 @@ func AuthMiddleware(repo entities.UserRepository) echo.MiddlewareFunc {
 	}
 }
 
-func ExtractUserFromJWT(ctx context.Context, repo entities.UserRepository, authHeader string) (*entities.User, error) {
+func ExtractUserFromJWT(ctx context.Context, ur entities.UserRepository, tr entities.TokenHistoryRepository, authHeader string) (*entities.User, error) {
 	if authHeader == "" {
 		return nil, entities.ErrUserByCtxNotFound
+	}
+
+	t, _ := tr.FindByToken(ctx, authHeader)
+	if t != nil {
+		return nil, entities.ErrTokenAlreadyInvalidated
 	}
 
 	tu, err := entities.ParseToken(authHeader)
@@ -39,7 +44,7 @@ func ExtractUserFromJWT(ctx context.Context, repo entities.UserRepository, authH
 		return nil, err
 	}
 
-	u, err := repo.FindByID(ctx, tu.ID)
+	u, err := ur.FindByID(ctx, tu.ID)
 	if err != nil || u == nil {
 		return nil, entities.ErrUserByCtxNotFound
 	}

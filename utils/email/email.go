@@ -2,7 +2,6 @@ package email
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -45,13 +44,10 @@ func (c *EmailClient) SendSightingEmail(s *SightingEmail) error {
 
 	message := mail.NewSingleEmail(from, subject, to, plain, html)
 
-	res, err := c.sg.Send(message)
+	_, err = c.sg.Send(message)
 	if err != nil {
 		return err
 	}
-
-	js, _ := json.MarshalIndent(res, "", "  ")
-	fmt.Println(string(js))
 
 	return nil
 }

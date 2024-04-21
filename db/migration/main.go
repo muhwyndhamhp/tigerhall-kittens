@@ -18,9 +18,18 @@ func main() {
 		d = d.Debug()
 	}
 
-	runAutoMigrate(d)
+	// runAutoMigrate(d)
+	addTokenHistory(d)
 }
 
+func addTokenHistory(d *gorm.DB) {
+	err := d.AutoMigrate(&entities.TokenHistory{})
+	if err != nil {
+		panic(err)
+	}
+}
+
+// nolint unused
 func runAutoMigrate(d *gorm.DB) {
 	err := d.AutoMigrate(&entities.User{})
 	if err != nil {

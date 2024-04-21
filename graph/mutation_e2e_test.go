@@ -3,10 +3,10 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/muhwyndhamhp/tigerhall-kittens/graph/model"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/entities"
 	"github.com/muhwyndhamhp/tigerhall-kittens/pkg/modules/user"
@@ -88,9 +88,14 @@ func TestMutation_Login(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			r, _, _ := Setup(t, now, tc.withRandomDBErr)
 
-			res, err := r.Mutation().Login(context.Background(), tc.email, tc.password)
+			jwt.TimeFunc = func() time.Time {
+				return now
+			}
 
-			fmt.Println(err)
+			res, err := r.
+				Mutation().
+				Login(context.Background(), tc.email, tc.password)
+
 			assert.Equal(t, tc.want, res)
 			assert.Equal(t, tc.wantErr, err)
 		})

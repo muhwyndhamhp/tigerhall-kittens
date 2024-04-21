@@ -49,16 +49,17 @@ func TestUsecase_CreateUser(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			repo := mocks.NewUserRepository(t)
+			ur := mocks.NewUserRepository(t)
+			tr := mocks.NewTokenHistoryRepository(t)
 
-			uc := NewUserUsecase(repo)
+			uc := NewUserUsecase(ur, tr)
 
-			repo.
+			ur.
 				On("FindByEmail", mock.Anything, tc.usr.Email).
 				Return(tc.findByEmailResp, tc.findByEmailErr).
 				Once()
 
-			repo.
+			ur.
 				On("Create", mock.Anything, mock.Anything).
 				Return(tc.createErr).
 				Maybe()
@@ -98,11 +99,12 @@ func TestUsecase_Login(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			repo := mocks.NewUserRepository(t)
+			ur := mocks.NewUserRepository(t)
+			tr := mocks.NewTokenHistoryRepository(t)
 
-			uc := NewUserUsecase(repo)
+			uc := NewUserUsecase(ur, tr)
 
-			repo.
+			ur.
 				On("FindByEmail", mock.Anything, tc.email).
 				Return(&entities.User{
 					Model: gorm.Model{
@@ -147,11 +149,12 @@ func TestUsecase_GetUserByID(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			repo := mocks.NewUserRepository(t)
+			ur := mocks.NewUserRepository(t)
+			tr := mocks.NewTokenHistoryRepository(t)
 
-			uc := NewUserUsecase(repo)
+			uc := NewUserUsecase(ur, tr)
 
-			repo.
+			ur.
 				On("FindByID", mock.Anything, tc.id).
 				Return(&entities.User{
 					Model: gorm.Model{
@@ -194,11 +197,17 @@ func TestUsecase_RefreshToken(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			repo := mocks.NewUserRepository(t)
+			ur := mocks.NewUserRepository(t)
+			tr := mocks.NewTokenHistoryRepository(t)
 
-			uc := NewUserUsecase(repo)
+			uc := NewUserUsecase(ur, tr)
 
-			repo.
+			tr.
+				On("FindByToken", mock.Anything, tc.token).
+				Return(nil, nil).
+				Once()
+
+			ur.
 				On("FindByID", mock.Anything, uint(1)).
 				Return(&entities.User{
 					Model: gorm.Model{
@@ -207,7 +216,7 @@ func TestUsecase_RefreshToken(t *testing.T) {
 					Name:  "user-1",
 					Email: "email-1@example.com",
 				}, tc.findByIDErr).
-				Once()
+				Maybe()
 
 			token, err := uc.RefreshToken(context.Background(), tc.token)
 
