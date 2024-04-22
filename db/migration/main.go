@@ -18,15 +18,7 @@ func main() {
 		d = d.Debug()
 	}
 
-	// runAutoMigrate(d)
-	addTokenHistory(d)
-}
-
-func addTokenHistory(d *gorm.DB) {
-	err := d.AutoMigrate(&entities.TokenHistory{})
-	if err != nil {
-		panic(err)
-	}
+	runAutoMigrate(d)
 }
 
 // nolint unused
@@ -42,6 +34,11 @@ func runAutoMigrate(d *gorm.DB) {
 	}
 
 	err = d.AutoMigrate(&entities.Sighting{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = d.AutoMigrate(&entities.TokenHistory{})
 	if err != nil {
 		panic(err)
 	}
